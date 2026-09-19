@@ -11,6 +11,9 @@ import {
   serverTimestamp,
   limit,
   getDoc,
+  increment,
+  arrayUnion,
+  arrayRemove,
 } from 'firebase/firestore'
 import { getAuth } from 'firebase/auth'
 
@@ -36,13 +39,38 @@ export function useMessages() {
     messages.value = []
     messagesLoading.value = true
 
+    const uid = auth.currentUser?.uid
+    if (uid) {
+      const dbRef = doc(db, 'chats', chatId)
+      updateDoc(dbRef, { [`unreadCount.${uid}`]: 0 }).catch(() => {})
+    }
+
+    const { notify } = useNotifications()
     const q = query(
       collection(db, 'chats', chatId, 'messages'),
       orderBy('createdAt', 'asc'),
       limit(200)
     )
-    unsubMessages = onSnapshot(q, (snap) => {
+
+    let isInitialLoad = true
+
+    unsubMessages = onSnapshot(q, async (snap) => {
       messages.value = snap.docs.map((d) => ({ id: d.id, ...d.data() }))
+
+      if (!isInitialLoad) {
+        snap.docChanges().forEach(change => {
+          if (change.type === 'added') {
+            const m = change.doc.data()
+            if (m.senderId !== uid && !m.isDeleted) {
+              const senderName = m.senderId === 'bot_echo' ? 'Echo Bot' : 'Someone'
+              const text = m.type === 'text' ? m.text : 'Sent an attachment'
+              notify(`New message from ${senderName}`, { body: text })
+            }
+          }
+        })
+      }
+      isInitialLoad = false
+
       messagesLoading.value = false
     }, (err) => {
       console.error('subscribeMessages error:', err)
@@ -79,17 +107,27 @@ export function useMessages() {
 
     await addDoc(collection(db, 'chats', chatId, 'messages'), messageData)
 
-    // Update chat's last message
+    // Fetch chat to update unread counts
+    const chatSnap = await getDoc(doc(db, 'chats', chatId))
+    const chatData = chatSnap.data() || {}
+    const participants = chatData.participants || []
+    
+    const unreadUpdates = {}
+    participants.forEach(p => {
+      if (p !== uid) {
+        unreadUpdates[`unreadCount.${p}`] = increment(1)
+      }
+    })
+
+    // Update chat's last message and unread counts
     await updateDoc(doc(db, 'chats', chatId), {
       lastMessage: payload.type === 'text' ? payload.text : `📎 ${payload.fileName || 'File'}`,
       lastMessageAt: serverTimestamp(),
+      ...unreadUpdates
     })
 
     // --- Echo Bot Interceptor ---
     // If this is a direct chat with the bot, simulate a reply.
-    const chatSnap = await getDoc(doc(db, 'chats', chatId))
-    const participants = chatSnap.data()?.participants || []
-    
     if (participants.includes('bot_echo') && uid !== 'bot_echo') {
       setTimeout(async () => {
         const replyText = payload.type === 'text' 
@@ -113,7 +151,52 @@ export function useMessages() {
 
   async function deleteMessage(chatId, messageId) {
     const db = getDb()
-    await deleteDoc(doc(db, 'chats', chatId, 'messages', messageId))
+    await updateDoc(doc(db, 'chats', chatId, 'messages', messageId), {
+      isDeleted: true,
+      text: null,
+      fileUrl: null,
+      fileName: null
+    })
+  }
+
+  async function editMessage(chatId, messageId, newText) {
+    const db = getDb()
+    await updateDoc(doc(db, 'chats', chatId, 'messages', messageId), {
+      text: newText,
+      isEdited: true,
+    })
+  }
+
+  async function clearChat(chatId) {
+    const db = getDb()
+    const uid = auth.currentUser?.uid
+    if (!uid) return
+    await updateDoc(doc(db, 'chats', chatId), {
+      [`clearedAt.${uid}`]: serverTimestamp()
+    })
+  }
+
+  async function toggleReaction(chatId, messageId, emoji) {
+    const db = getDb()
+    const uid = auth.currentUser?.uid
+    if (!uid) return
+    
+    const msgRef = doc(db, 'chats', chatId, 'messages', messageId)
+    const msgSnap = await getDoc(msgRef)
+    if (!msgSnap.exists()) return
+
+    const data = msgSnap.data()
+    const currentReactions = data.reactions?.[emoji] || []
+    
+    if (currentReactions.includes(uid)) {
+      await updateDoc(msgRef, {
+        [`reactions.${emoji}`]: arrayRemove(uid)
+      })
+    } else {
+      await updateDoc(msgRef, {
+        [`reactions.${emoji}`]: arrayUnion(uid)
+      })
+    }
   }
 
   return {
@@ -124,5 +207,8 @@ export function useMessages() {
     unsubscribeMessages,
     sendMessage,
     deleteMessage,
+    editMessage,
+    clearChat,
+    toggleReaction,
   }
 }

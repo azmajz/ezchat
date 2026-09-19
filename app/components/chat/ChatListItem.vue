@@ -61,7 +61,10 @@ const lastMessageTime = computed(() => {
   return date.toLocaleDateString([], { month: 'short', day: 'numeric' })
 })
 
-const unreadCount = ref(0) // Simplified — full implementation needs per-user read tracking
+const unreadCount = computed(() => {
+  if (!currentUser.value?.uid) return 0
+  return props.chat.unreadCount?.[currentUser.value.uid] || 0
+})
 
 function loadOtherUser() {
   if (props.chat.type !== 'direct') return

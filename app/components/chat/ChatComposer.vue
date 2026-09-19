@@ -20,6 +20,17 @@
       </button>
     </div>
 
+    <!-- Edit bar -->
+    <div v-if="messageToEdit" class="edit-bar">
+      <div class="edit-bar-info">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"/></svg>
+        <span>Editing message</span>
+      </div>
+      <button class="btn-icon" @click="emit('cancel-edit')">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+
     <!-- Main composer row -->
     <div class="composer-row">
       <!-- Attach button -->
@@ -62,15 +73,33 @@
 </template>
 
 <script setup>
-const props = defineProps({ chatId: { type: String, required: true } })
+const props = defineProps({
+  chatId: { type: String, required: true },
+  messageToEdit: { type: Object, default: null }
+})
+const emit = defineEmits(['cancel-edit'])
 
-const { sendMessage } = useMessages()
+const { sendMessage, editMessage } = useMessages()
 const { setTypingState } = useChats()
 const { uploadChatFile, uploadProgress, isUploading } = useStorage()
 const { showToast } = useUI()
 
 const text = ref('')
 const textareaRef = ref(null)
+
+watch(() => props.messageToEdit, (msg) => {
+  if (msg && msg.type === 'text') {
+    text.value = msg.text || ''
+    nextTick(() => {
+      autoResize()
+      textareaRef.value?.focus()
+    })
+  } else if (!msg) {
+    text.value = ''
+    nextTick(() => autoResize())
+  }
+})
+
 const fileInput = ref(null)
 const pendingFile = ref(null)
 const filePreviewUrl = ref(null)
@@ -122,6 +151,14 @@ async function send() {
   clearTimeout(typingTimeout)
 
   try {
+    if (props.messageToEdit) {
+      if (text.value.trim()) {
+        await editMessage(props.chatId, props.messageToEdit.id, text.value.trim())
+      }
+      emit('cancel-edit')
+      return
+    }
+
     if (pendingFile.value) {
       const file = pendingFile.value
       const type = file.type.startsWith('image/') ? 'image' : 'file'
@@ -146,6 +183,22 @@ async function send() {
   border-top: 1px solid var(--color-border);
   background: var(--color-surface);
   flex-shrink: 0;
+}
+
+.edit-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.5rem 1rem;
+  background: var(--color-surface-2);
+  border-bottom: 1px solid var(--color-border);
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-sm);
+}
+.edit-bar-info {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
 }
 
 .upload-progress-bar {

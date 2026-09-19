@@ -18,9 +18,12 @@
           :message="item"
           :is-own="item.senderId === currentUser?.uid"
           :sender-data="getSenderData(item.senderId)"
+          :get-participant="getSenderData"
           :is-group="isGroup"
           :is-first-from-sender="item.isFirstFromSender"
           @delete="$emit('delete-message', item.id)"
+          @edit="$emit('edit-message', item)"
+          @react="(emoji) => $emit('react-message', item.id, emoji)"
         />
       </template>
 
@@ -47,7 +50,7 @@ const props = defineProps({
   isGroup: { type: Boolean, default: false },
   chat: { type: Object, default: null },
 })
-defineEmits(['delete-message'])
+defineEmits(['delete-message', 'edit-message', 'react-message'])
 
 const { currentUser } = useAuth()
 const containerRef = ref(null)
@@ -93,13 +96,19 @@ onUnmounted(() => {
   Object.values(unsubs).forEach(unsub => unsub())
 })
 
-// Group messages by date with date separators
 const groupedMessages = computed(() => {
   const items = []
   let lastDate = null
   let lastSender = null
+
+  const clearedAt = props.chat?.clearedAt?.[currentUser.value?.uid]
+  const clearTime = clearedAt ? (clearedAt.toDate ? clearedAt.toDate().getTime() : new Date(clearedAt).getTime()) : 0
+
   for (const msg of props.messages) {
     const ts = msg.createdAt
+    const msgTime = ts?.toDate ? ts.toDate().getTime() : (ts ? new Date(ts).getTime() : Date.now())
+    if (clearTime && msgTime <= clearTime) continue
+
     const date = ts?.toDate ? ts.toDate() : (ts ? new Date(ts) : new Date())
     const dateStr = date.toDateString()
     if (dateStr !== lastDate) {
