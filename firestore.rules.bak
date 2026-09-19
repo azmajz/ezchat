@@ -1,0 +1,65 @@
+http://localhost:3001/chatrules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Helper: check if request is authenticated
+    function isAuth() {
+      return request.auth != null;
+    }
+
+    // Helper: check if user is a participant in a chat
+    function isParticipant(chatId) {
+      return isAuth() &&
+        request.auth.uid in get(/databases/$(database)/documents/chats/$(chatId)).data.participants;
+    }
+
+    // ── Users ──────────────────────────────────────────────
+    match /users/{uid} {
+      // Any authenticated user can read user profiles (for search, etc.)
+      allow read: if isAuth();
+
+      // Only the user themselves can create/update their own document
+      allow create: if isAuth() && request.auth.uid == uid;
+      allow update: if isAuth() && request.auth.uid == uid;
+      allow delete: if false;
+    }
+
+    // ── Chats ──────────────────────────────────────────────
+    match /chats/{chatId} {
+      // Only participants can read a chat
+      allow read: if isAuth() &&
+        request.auth.uid in resource.data.participants;
+
+      // Any authenticated user can create a chat if they include themselves as participant
+      allow create: if isAuth() &&
+        request.auth.uid in request.resource.data.participants &&
+        request.resource.data.participants.size() >= 2 &&
+        request.resource.data.participants.size() <= 100;
+
+      // Only participants can update chat metadata (name, photo, lastMessage, etc.)
+      allow update: if isAuth() &&
+        request.auth.uid in resource.data.participants;
+
+      // No one can delete chats
+      allow delete: if false;
+
+      // ── Messages ────────────────────────────────────────
+      match /messages/{messageId} {
+        // Only chat participants can read messages
+        allow read: if isParticipant(chatId);
+
+        // Only chat participants can send messages, and must identify themselves
+        allow create: if isParticipant(chatId) &&
+          request.resource.data.senderId == request.auth.uid &&
+          request.resource.data.createdAt == request.time;
+
+        // Only the message sender can delete their own message
+        allow delete: if isAuth() &&
+          request.auth.uid == resource.data.senderId;
+
+        // No one can edit messages (immutable)
+        allow update: if false;
+      }
+    }
+  }
+}
