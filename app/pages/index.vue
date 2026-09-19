@@ -3,6 +3,5 @@
 </template>
 
 <script setup>
-definePageMeta({ middleware: 'auth' })
-await navigateTo('/chat')
+await navigateTo('/home')
 </script>

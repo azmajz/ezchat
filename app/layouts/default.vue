@@ -1,5 +1,8 @@
 <template>
   <div class="chat-layout">
+    <aside class="chat-nav-rail" :class="{ 'sidebar-hidden': isMobile && hasChatId }">
+      <NavRail />
+    </aside>
     <aside class="chat-sidebar-panel" :class="{ 'sidebar-hidden': isMobile && hasChatId }">
       <ChatSidebar />
     </aside>
@@ -57,6 +60,16 @@ onUnmounted(() => unsubscribeChats())
   background: var(--color-surface);
 }
 
+.chat-nav-rail {
+  width: var(--nav-rail-width);
+  flex-shrink: 0;
+  border-right: 1px solid var(--color-border);
+  display: flex;
+  flex-direction: column;
+  background: var(--color-surface-2);
+  z-index: 10;
+}
+
 .chat-sidebar-panel {
   width: var(--sidebar-width);
   flex-shrink: 0;
@@ -78,6 +91,10 @@ onUnmounted(() => unsubscribeChats())
 
 /* Mobile layout — full screen panels, one at a time */
 @media (max-width: 767px) {
+  .chat-nav-rail {
+    display: none;
+  }
+
   .chat-sidebar-panel {
     width: 100%;
     border-right: none;

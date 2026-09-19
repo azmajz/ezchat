@@ -40,8 +40,13 @@
 .auth-blob {
   position: absolute;
   border-radius: 50%;
-  filter: blur(80px);
+  filter: blur(120px);
   opacity: 0.15;
+}
+
+html.dark .auth-blob {
+  filter: blur(160px);
+  opacity: 0.12;
 }
 
 .auth-blob-1 {

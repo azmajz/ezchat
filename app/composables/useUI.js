@@ -1,5 +1,7 @@
 // Toast system — self-contained, globally accessible
 const toasts = ref([])
+const showSearchModal = ref(false)
+const showGroupCreateModal = ref(false)
 
 export function useUI() {
   function showToast(message, type = 'info', duration = 3000) {
@@ -13,5 +15,7 @@ export function useUI() {
   return {
     toasts,
     showToast,
+    showSearchModal,
+    showGroupCreateModal
   }
 }

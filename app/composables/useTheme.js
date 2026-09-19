@@ -2,15 +2,12 @@ const theme = ref('light')
 
 export function useTheme() {
   function applyTheme(value) {
-    if (import.meta.client) {
-      document.documentElement.classList.toggle('dark', value === 'dark')
-    }
+    document.documentElement.classList.toggle('dark', value === 'dark')
   }
 
   function initTheme() {
-    if (!import.meta.client) return
     const saved = localStorage.getItem('ezchat-theme')
-    const preferred = saved || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light')
+    const preferred = saved || 'light'
     theme.value = preferred
     applyTheme(preferred)
   }

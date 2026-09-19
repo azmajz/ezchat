@@ -11,9 +11,23 @@
       </svg>
     </div>
     <h2 class="empty-title">Your conversations</h2>
-    <p class="empty-subtitle">Select a chat from the left, or use the <strong>+</strong> button to start a new one.</p>
+    <p class="empty-subtitle">Select a chat from the left, or start a new conversation to connect.</p>
+    <div class="empty-actions">
+      <button class="btn btn-primary" @click="showSearchModal = true">
+        <Icon name="lucide:search" size="18" style="margin-right: 0.5rem;" />
+        Find People
+      </button>
+      <button class="btn btn-secondary" @click="showGroupCreateModal = true">
+        <Icon name="lucide:users" size="18" style="margin-right: 0.5rem;" />
+        Create Group
+      </button>
+    </div>
   </div>
 </template>
+
+<script setup>
+const { showSearchModal, showGroupCreateModal } = useUI()
+</script>
 
 <style scoped>
 .chat-empty {
@@ -50,5 +64,10 @@
   font-size: 14px;
   font-weight: 700;
   vertical-align: middle;
+}
+.empty-actions {
+  display: flex;
+  gap: 1rem;
+  margin-top: 1rem;
 }
 </style>

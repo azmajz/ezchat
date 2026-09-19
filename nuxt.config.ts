@@ -3,6 +3,18 @@ export default defineNuxtConfig({
   compatibilityDate: '2025-07-15',
   devtools: { enabled: false },
 
+  modules: ['@nuxt/icon'],
+
+  icon: {
+    clientBundle: {
+      scan: true,
+      icons: [
+        'lucide:sun',
+        'lucide:moon'
+      ]
+    }
+  },
+
   css: ['~/assets/css/main.css'],
 
   app: {

@@ -292,6 +292,11 @@ async function send() {
   max-height: 120px;
   overflow-y: auto;
   transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.composer-input::-webkit-scrollbar {
+  display: none;
 }
 
 .composer-input:focus {

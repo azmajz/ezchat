@@ -6,7 +6,7 @@
     </NuxtLink>
 
     <!-- Avatar + info -->
-    <button class="header-info" @click="openInfo" :class="{ clickable: chat?.type === 'group' }">
+    <button class="header-info clickable" @click="openInfo">
       <AppAvatar
         :src="avatarSrc"
         :name="displayName"
@@ -29,15 +29,25 @@
 
     <!-- Actions -->
     <div class="header-actions">
-      <button class="btn-icon" @click="$emit('clear-chat')" title="Clear chat">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg>
-      </button>
-      <button v-if="chat?.type === 'group'" class="btn-icon" @click="showGroupInfo = true" title="Group info">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
-      </button>
+      <div class="dropdown-container">
+        <button class="btn-icon" @click="showMenu = !showMenu" title="More options">
+          <Icon name="lucide:more-vertical" size="20" />
+        </button>
+        <div v-if="showMenu" class="dropdown-overlay" @click="showMenu = false"></div>
+        <div v-if="showMenu" class="dropdown-menu">
+          <button class="dropdown-item" @click="openInfo(); showMenu = false">
+             <Icon name="lucide:info" size="16" /> View Info
+          </button>
+          <div class="dropdown-divider"></div>
+          <button class="dropdown-item text-danger" @click="$emit('clear-chat'); showMenu = false">
+             <Icon name="lucide:trash-2" size="16" /> Clear Chat
+          </button>
+        </div>
+      </div>
     </div>
 
     <GroupInfoPanel v-if="chat?.type === 'group'" v-model="showGroupInfo" :chat="chat" />
+    <UserInfoPanel v-if="chat?.type === 'direct'" v-model="showUserInfo" :user="otherUserData" />
   </header>
 </template>
 
@@ -51,6 +61,8 @@ defineEmits(['clear-chat'])
 
 const { currentUser } = useAuth()
 const showGroupInfo = ref(false)
+const showUserInfo = ref(false)
+const showMenu = ref(false)
 const otherUserData = ref(null)
 let unsubUser = null
 
@@ -94,6 +106,7 @@ function loadOtherUser() {
 
 function openInfo() {
   if (props.chat?.type === 'group') showGroupInfo.value = true
+  else if (props.chat?.type === 'direct') showUserInfo.value = true
 }
 
 watch(() => props.chat, loadOtherUser, { immediate: true })
@@ -167,4 +180,39 @@ onUnmounted(() => { if (unsubUser) unsubUser() })
   align-items: center;
   gap: 0.25rem;
 }
+
+/* Dropdown Menu */
+.dropdown-container { position: relative; display: flex; align-items: center; justify-content: center; }
+.dropdown-overlay { position: fixed; inset: 0; z-index: 40; cursor: default; }
+.dropdown-menu {
+  position: absolute;
+  top: calc(100% + 0.5rem);
+  right: 0;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-md);
+  min-width: 180px;
+  z-index: 50;
+  display: flex;
+  flex-direction: column;
+}
+.dropdown-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  width: 100%;
+  padding: 0.75rem 1rem;
+  text-align: left;
+  background: none;
+  border: none;
+  font-size: var(--font-size-sm);
+  color: var(--color-text);
+  cursor: pointer;
+  text-decoration: none;
+  transition: background var(--transition-fast);
+}
+.dropdown-item:hover { background: var(--color-surface-3); }
+.dropdown-divider { height: 1px; background: var(--color-border); margin: 0.25rem 0; }
+.text-danger { color: var(--color-error); }
 </style>
