@@ -162,8 +162,8 @@ async function send() {
     if (pendingFile.value) {
       const file = pendingFile.value
       const type = file.type.startsWith('image/') ? 'image' : 'file'
-      const { url, fileName, fileSize, mimeType } = await uploadChatFile(props.chatId, file)
-      await sendMessage(props.chatId, { type, fileUrl: url, fileName, fileSize, mimeType })
+      const { url, publicId, resourceType, fileName, fileSize, mimeType } = await uploadChatFile(props.chatId, file)
+      await sendMessage(props.chatId, { type, fileUrl: url, filePublicId: publicId, fileResourceType: resourceType, fileName, fileSize, mimeType })
       clearFile()
     }
 

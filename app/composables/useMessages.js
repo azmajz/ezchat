@@ -99,6 +99,8 @@ export function useMessages() {
       type: payload.type || 'text',
       text: payload.text || null,
       fileUrl: payload.fileUrl || null,
+      filePublicId: payload.filePublicId || null,
+      fileResourceType: payload.fileResourceType || null,
       fileName: payload.fileName || null,
       fileSize: payload.fileSize || null,
       mimeType: payload.mimeType || null,
@@ -154,10 +156,24 @@ export function useMessages() {
 
   async function deleteMessage(chatId, messageId) {
     const db = getDb()
-    await updateDoc(doc(db, 'chats', chatId, 'messages', messageId), {
+    const msgRef = doc(db, 'chats', chatId, 'messages', messageId)
+    
+    // First, check if the message has a file attached
+    const msgSnap = await getDoc(msgRef)
+    if (msgSnap.exists()) {
+      const data = msgSnap.data()
+      if (data.filePublicId) {
+        // Delete from Cloudinary
+        const { deleteFileFromCloudinary } = useStorage()
+        await deleteFileFromCloudinary(data.filePublicId, data.fileResourceType || 'image')
+      }
+    }
+
+    await updateDoc(msgRef, {
       isDeleted: true,
       text: null,
       fileUrl: null,
+      filePublicId: null,
       fileName: null
     })
   }

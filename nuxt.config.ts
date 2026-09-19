@@ -17,6 +17,13 @@ export default defineNuxtConfig({
 
   css: ['~/assets/css/main.css'],
 
+  runtimeConfig: {
+    public: {
+      cloudinaryApiKey: process.env.CLOUDINARY_API_KEY || '',
+      cloudinaryApiSecret: process.env.CLOUDINARY_API_SECRET || '',
+    }
+  },
+
   app: {
     head: {
       title: 'EzChat — Chat made easy.',

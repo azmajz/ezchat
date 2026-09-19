@@ -1,5 +1,5 @@
 <template>
-  <div class="message-wrap" :class="[isOwn ? 'own' : 'other', isFirstFromSender ? 'first-in-group' : '']" @mouseenter="hovered = true" @mouseleave="handleMouseLeave">
+  <div class="message-wrap" :class="[isOwn ? 'own' : 'other', isFirstFromSender ? 'first-in-group' : '', hasReactions ? 'has-reactions' : '']" @mouseenter="hovered = true" @mouseleave="handleMouseLeave">
     
     <!-- Avatar (only for received messages) -->
     <div v-if="!isOwn" class="message-avatar">
@@ -17,7 +17,7 @@
           </p>
           <span class="bubble-time">{{ formattedTime }}</span>
         </div>
-        <div v-else class="bubble" :class="[isOwn ? 'bubble-sent' : 'bubble-received', `bubble-${message.type}`, !isFirstFromSender ? 'bubble-chained' : '', hasReactions ? 'has-reactions' : '']">
+        <div v-else class="bubble" :class="[isOwn ? 'bubble-sent' : 'bubble-received', `bubble-${message.type}`, !isFirstFromSender ? 'bubble-chained' : '']">
           <!-- Text message -->
           <template v-if="message.type === 'text'">
             <p class="bubble-text">{{ message.text }} <span v-if="message.isEdited" style="font-size: 0.75em; opacity: 0.7;">(edited)</span></p>
@@ -31,21 +31,6 @@
 
           <span class="bubble-time">{{ formattedTime }}</span>
 
-          <!-- Display Reactions -->
-          <div v-if="hasReactions" class="reactions-display">
-            <template v-for="(uids, emoji) in message.reactions" :key="emoji">
-              <button
-                v-if="uids.length > 0"
-                class="reaction-badge"
-                :class="{ active: uids.includes(currentUser?.uid) }"
-                @click.stop="onReact(emoji)"
-                :title="getReactorsText(uids)"
-              >
-                <span class="reaction-emoji">{{ emoji }}</span>
-                <span class="reaction-count">{{ uids.length }}</span>
-              </button>
-            </template>
-          </div>
         </div>
 
         <!-- Hover Actions -->
@@ -90,6 +75,22 @@
             </div>
           </div>
         </Transition>
+      </div>
+      
+      <!-- Display Reactions -->
+      <div v-if="hasReactions" class="reactions-display">
+        <template v-for="(uids, emoji) in message.reactions" :key="emoji">
+          <button
+            v-if="uids.length > 0"
+            class="reaction-badge"
+            :class="{ active: uids.includes(currentUser?.uid) }"
+            @click.stop="onReact(emoji)"
+            :title="getReactorsText(uids)"
+          >
+            <span class="reaction-emoji">{{ emoji }}</span>
+            <span class="reaction-count">{{ uids.length }}</span>
+          </button>
+        </template>
       </div>
     </div>
   </div>
@@ -222,10 +223,6 @@ const formattedTime = computed(() => {
   border-radius: var(--radius-lg);
   max-width: 100%;
   position: relative;
-}
-
-.bubble.has-reactions {
-  margin-bottom: 16px;
 }
 
 .bubble-sent {
@@ -376,15 +373,20 @@ const formattedTime = computed(() => {
   display: flex;
   flex-wrap: wrap;
   gap: 0.25rem;
-  position: absolute;
-  bottom: -14px;
-  right: 12px;
+  margin-top: -12px;
   z-index: 5;
+  position: relative;
+  max-width: 90%;
 }
 
-.bubble-received .reactions-display {
-  right: auto;
-  left: 12px;
+.message-wrap.own .reactions-display {
+  margin-right: 12px;
+  justify-content: flex-end;
+}
+
+.message-wrap.other .reactions-display {
+  margin-left: 12px;
+  justify-content: flex-start;
 }
 
 .reaction-badge {

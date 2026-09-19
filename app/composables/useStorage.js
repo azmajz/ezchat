@@ -26,7 +26,11 @@ export function useStorage() {
         if (xhr.status >= 200 && xhr.status < 300) {
           try {
             const response = JSON.parse(xhr.responseText)
-            resolve(response.secure_url)
+            resolve({
+              url: response.secure_url,
+              publicId: response.public_id,
+              resourceType: response.resource_type
+            })
           } catch (err) {
             reject(new Error('Invalid response from Cloudinary'))
           }
@@ -56,16 +60,54 @@ export function useStorage() {
   }
 
   async function uploadChatFile(chatId, file) {
-    const url = await uploadFile(file, `ezchat/chats/${chatId}`)
-    return { url, fileName: file.name, fileSize: file.size, mimeType: file.type }
+    const { url, publicId, resourceType } = await uploadFile(file, `ezchat/chats/${chatId}`)
+    return { url, publicId, resourceType, fileName: file.name, fileSize: file.size, mimeType: file.type }
   }
 
   async function uploadAvatar(uid, file) {
-    return await uploadFile(file, `ezchat/avatars/${uid}`)
+    const { url } = await uploadFile(file, `ezchat/avatars/${uid}`)
+    return url
   }
 
   async function uploadGroupImage(groupId, file) {
-    return await uploadFile(file, `ezchat/groups/${groupId}`)
+    const { url } = await uploadFile(file, `ezchat/groups/${groupId}`)
+    return url
+  }
+
+  async function deleteFileFromCloudinary(publicId, resourceType = 'image') {
+    const config = useRuntimeConfig()
+    const apiKey = config.public.cloudinaryApiKey
+    const apiSecret = config.public.cloudinaryApiSecret
+    
+    if (!apiKey || !apiSecret) {
+      console.warn('Missing Cloudinary API Key or Secret. File not deleted from Cloudinary.')
+      return
+    }
+
+    const timestamp = Math.round(new Date().getTime() / 1000).toString()
+    const str = `public_id=${publicId}&timestamp=${timestamp}${apiSecret}`
+    
+    const buffer = new TextEncoder().encode(str)
+    const hashBuffer = await crypto.subtle.digest('SHA-1', buffer)
+    const hashArray = Array.from(new Uint8Array(hashBuffer))
+    const signature = hashArray.map(b => b.toString(16).padStart(2, '0')).join('')
+
+    const formData = new FormData()
+    formData.append('public_id', publicId)
+    formData.append('api_key', apiKey)
+    formData.append('timestamp', timestamp)
+    formData.append('signature', signature)
+
+    try {
+      const res = await fetch(`https://api.cloudinary.com/v1_1/dpz0gr14a/${resourceType}/destroy`, {
+        method: 'POST',
+        body: formData
+      })
+      const data = await res.json()
+      console.log('Cloudinary delete result:', data)
+    } catch (e) {
+      console.error('Failed to delete from Cloudinary', e)
+    }
   }
 
   return {
@@ -75,5 +117,6 @@ export function useStorage() {
     uploadChatFile,
     uploadAvatar,
     uploadGroupImage,
+    deleteFileFromCloudinary,
   }
 }
