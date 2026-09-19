@@ -9,11 +9,7 @@
     <div class="auth-container animate-scale-in">
       <div class="auth-brand">
         <div class="auth-logo">
-          <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
-            <rect width="32" height="32" rx="10" fill="var(--color-primary)"/>
-            <path d="M8 10h16M8 16h10M8 22h13" stroke="white" stroke-width="2.5" stroke-linecap="round"/>
-            <circle cx="25" cy="22" r="4" fill="white"/>
-          </svg>
+          <AppLogo size="54" />
         </div>
         <span class="auth-brand-name">EzChat</span>
       </div>
@@ -80,11 +76,13 @@
 .auth-brand {
   display: flex;
   align-items: center;
+  justify-content: center;
   gap: 0.75rem;
-  margin-bottom: 2rem;
+  margin-bottom: 0.5rem;
 }
 
 .auth-brand-name {
+  display: none !important;
   font-size: var(--font-size-xl);
   font-weight: 700;
   color: var(--color-text);

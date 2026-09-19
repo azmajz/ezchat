@@ -7,7 +7,7 @@ export default defineNuxtConfig({
 
   app: {
     head: {
-      title: 'EzChat — Realtime Chat',
+      title: 'EzChat — Chat made easy.',
       meta: [
         { charset: 'utf-8' },
         { name: 'viewport', content: 'width=device-width, initial-scale=1' },
@@ -15,6 +15,7 @@ export default defineNuxtConfig({
         { name: 'theme-color', content: '#6366f1' },
       ],
       link: [
+        { rel: 'icon', type: 'image/svg+xml', href: '/chatfill.svg' },
         { rel: 'preconnect', href: 'https://fonts.googleapis.com' },
         { rel: 'preconnect', href: 'https://fonts.gstatic.com', crossorigin: '' },
         {

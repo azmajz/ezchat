@@ -3,11 +3,7 @@
     <!-- Header -->
     <div class="sidebar-header">
       <div class="sidebar-brand">
-        <svg width="28" height="28" viewBox="0 0 32 32" fill="none">
-          <rect width="32" height="32" rx="9" fill="var(--color-primary)"/>
-          <path d="M8 10h16M8 16h10M8 22h13" stroke="white" stroke-width="2.5" stroke-linecap="round"/>
-          <circle cx="25" cy="22" r="4" fill="white"/>
-        </svg>
+        <AppLogo size="32" />
         <span class="sidebar-brand-name">EzChat</span>
       </div>
       <div class="sidebar-actions">
