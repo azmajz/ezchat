@@ -164,7 +164,6 @@ const formattedTime = computed(() => {
   gap: 0.5rem;
   max-width: 85%;
   animation: messagePop 180ms ease forwards;
-  margin: 0.125rem 0;
 }
 
 .message-wrap.first-in-group {
@@ -223,11 +222,10 @@ const formattedTime = computed(() => {
   border-radius: var(--radius-lg);
   max-width: 100%;
   position: relative;
-  margin-bottom: 8px;
 }
 
 .bubble.has-reactions {
-  margin-bottom: 20px;
+  margin-bottom: 16px;
 }
 
 .bubble-sent {

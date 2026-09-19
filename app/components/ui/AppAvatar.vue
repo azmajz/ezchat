@@ -1,7 +1,7 @@
 <template>
   <div class="avatar" :class="[`avatar-${size}`]">
     <img v-if="effectiveSrc" :src="effectiveSrc" :alt="name" class="avatar-img" @error="imgError = true" />
-    <span v-else class="avatar-initials">{{ initials }}</span>
+    <span v-else class="avatar-initials" :style="avatarStyle">{{ initials }}</span>
     <span v-if="online !== undefined" class="avatar-status" :class="online ? 'online' : 'offline'"></span>
   </div>
 </template>
@@ -21,6 +21,25 @@ const initials = computed(() => {
   const words = props.name?.trim().split(/\s+/) || []
   if (words.length >= 2) return (words[0][0] + words[1][0]).toUpperCase()
   return words[0]?.[0]?.toUpperCase() || '?'
+})
+
+const avatarColors = [
+  '#d32f2f', '#c2185b', '#7b1fa2', '#512da8', '#303f9f',
+  '#1976d2', '#0288d1', '#0097a7', '#00796b', '#388e3c',
+  '#689f38', '#f57c00', '#e64a19', '#5d4037', '#455a64'
+]
+
+const avatarStyle = computed(() => {
+  const nameStr = props.name || '?'
+  let hash = 0
+  for (let i = 0; i < nameStr.length; i++) {
+    hash = nameStr.charCodeAt(i) + ((hash << 5) - hash)
+  }
+  const index = Math.abs(hash) % avatarColors.length
+  return {
+    backgroundColor: avatarColors[index],
+    color: '#ffffff'
+  }
 })
 </script>
 
@@ -48,8 +67,6 @@ const initials = computed(() => {
   display: flex;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(135deg, var(--color-primary), #8b5cf6);
-  color: white;
   font-weight: 600;
 }
 .avatar-status {

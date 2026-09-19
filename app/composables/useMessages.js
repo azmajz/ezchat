@@ -123,6 +123,7 @@ export function useMessages() {
     await updateDoc(doc(db, 'chats', chatId), {
       lastMessage: payload.type === 'text' ? payload.text : `📎 ${payload.fileName || 'File'}`,
       lastMessageAt: serverTimestamp(),
+      lastMessageSenderId: uid,
       ...unreadUpdates
     })
 
@@ -144,6 +145,8 @@ export function useMessages() {
         await updateDoc(doc(db, 'chats', chatId), {
           lastMessage: replyText,
           lastMessageAt: serverTimestamp(),
+          lastMessageSenderId: 'bot_echo',
+          [`unreadCount.${uid}`]: increment(1)
         })
       }, 1000)
     }

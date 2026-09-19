@@ -1,12 +1,12 @@
 <template>
   <div class="chat-layout">
-    <aside class="chat-nav-rail" :class="{ 'sidebar-hidden': isMobile && hasChatId }">
+    <aside class="chat-nav-rail" :class="{ 'sidebar-hidden': isMobile && mainPanelVisible }">
       <NavRail />
     </aside>
-    <aside class="chat-sidebar-panel" :class="{ 'sidebar-hidden': isMobile && hasChatId }">
+    <aside class="chat-sidebar-panel" :class="{ 'sidebar-hidden': isMobile && mainPanelVisible }">
       <ChatSidebar />
     </aside>
-    <main class="chat-main-panel" :class="{ 'panel-hidden': isMobile && !hasChatId }">
+    <main class="chat-main-panel" :class="{ 'panel-hidden': isMobile && !mainPanelVisible }">
       <slot />
     </main>
     <AppToast />
@@ -17,6 +17,9 @@
 const route = useRoute()
 
 const hasChatId = computed(() => !!route.params.chatId)
+const isSettings = computed(() => route.path.startsWith('/settings'))
+const mainPanelVisible = computed(() => hasChatId.value || isSettings.value)
+
 const isMobile = ref(false)
 
 function checkMobile() {

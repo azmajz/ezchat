@@ -2,7 +2,7 @@
   <div class="sidebar">
     <!-- Header -->
     <div class="sidebar-header">
-      <h2 class="sidebar-title">Chat</h2>
+      <h2 class="sidebar-title">{{ sidebarTitle }}</h2>
       
       <div class="sidebar-actions">
         <button class="btn-icon" @click="showGroupCreateModal = true" title="New group" id="btn-new-group">
@@ -76,17 +76,27 @@ const { showSearchModal, showGroupCreateModal } = useUI()
 
 const searchQuery = ref('')
 const activeChat = computed(() => route.params.chatId)
+const sidebarTitle = computed(() => route.query.filter === 'groups' ? 'Groups' : 'Chat')
 
 const filteredChats = computed(() => {
-  if (!searchQuery.value.trim()) return chats.value
-  const q = searchQuery.value.toLowerCase()
-  return chats.value.filter((c) => {
-    const name = c.type === 'group' ? c.name : ''
-    return (
-      name.toLowerCase().includes(q) ||
-      c.lastMessage?.toLowerCase().includes(q)
-    )
-  })
+  let list = chats.value
+  
+  if (route.query.filter === 'groups') {
+    list = list.filter(c => c.type === 'group')
+  }
+
+  if (searchQuery.value.trim()) {
+    const q = searchQuery.value.toLowerCase()
+    list = list.filter((c) => {
+      const name = c.type === 'group' ? c.name : ''
+      return (
+        name.toLowerCase().includes(q) ||
+        c.lastMessage?.toLowerCase().includes(q)
+      )
+    })
+  }
+  
+  return list
 })
 
 function openChat(chatId) {

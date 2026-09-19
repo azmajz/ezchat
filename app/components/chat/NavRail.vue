@@ -32,11 +32,11 @@
       </div>
       
       <!-- Primary Nav Tabs -->
-      <button class="nav-rail-item active" title="Chat">
+      <button class="nav-rail-item" :class="{ active: activeTab === 'chat' }" @click="setTab('chat')" title="Chat">
         <Icon name="lucide:message-square" size="24" />
         <span>Chat</span>
       </button>
-      <button class="nav-rail-item" title="Groups">
+      <button class="nav-rail-item" :class="{ active: activeTab === 'groups' }" @click="setTab('groups')" title="Groups">
         <Icon name="lucide:users" size="24" />
         <span>Groups</span>
       </button>
@@ -53,11 +53,20 @@
 </template>
 
 <script setup>
+const route = useRoute()
 const router = useRouter()
 const { currentUser, logout } = useAuth()
 const { theme, toggleTheme } = useTheme()
 
 const showProfileMenu = ref(false)
+const activeTab = computed(() => route.query.filter === 'groups' ? 'groups' : 'chat')
+
+function setTab(tab) {
+  const query = { ...route.query }
+  if (tab === 'groups') query.filter = 'groups'
+  else delete query.filter
+  router.push({ query })
+}
 
 async function handleLogout() {
   showProfileMenu.value = false

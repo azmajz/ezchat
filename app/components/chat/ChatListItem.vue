@@ -19,7 +19,11 @@
         <span class="item-time">{{ lastMessageTime }}</span>
       </div>
       <div class="item-row-bottom">
-        <span class="item-preview">{{ chat.lastMessage || 'No messages yet' }}</span>
+        <span class="item-preview">
+          <span v-if="chat.lastMessageSenderId === currentUser?.uid" style="font-weight: 500;">You: </span>
+          <span v-else-if="chat.type === 'group' && lastSenderName" style="font-weight: 500;">{{ lastSenderName }}: </span>
+          {{ chat.lastMessage || 'No messages yet' }}
+        </span>
         <span v-if="unreadCount > 0" class="badge">{{ unreadCount > 99 ? '99+' : unreadCount }}</span>
       </div>
     </div>
@@ -39,6 +43,8 @@ const { currentUser } = useAuth()
 
 const otherUserData = ref(null)
 let unsubUser = null
+const lastSenderName = ref('')
+let unsubLastSender = null
 
 const displayName = computed(() => {
   if (props.chat.type === 'group') return props.chat.name
@@ -76,8 +82,32 @@ function loadOtherUser() {
   })
 }
 
+function loadLastSender() {
+  if (unsubLastSender) { unsubLastSender(); unsubLastSender = null }
+  
+  if (props.chat.type !== 'group') return
+  const senderId = props.chat.lastMessageSenderId
+  if (!senderId || senderId === currentUser.value?.uid) {
+    lastSenderName.value = ''
+    return
+  }
+
+  const db = getFirestore()
+  unsubLastSender = onSnapshot(doc(db, 'users', senderId), (snap) => {
+    if (snap.exists()) {
+      const name = snap.data().displayName || ''
+      lastSenderName.value = name.split(' ')[0] // Just first name
+    }
+  })
+}
+
+watch(() => props.chat.lastMessageSenderId, loadLastSender, { immediate: true })
+
 onMounted(() => loadOtherUser())
-onUnmounted(() => { if (unsubUser) unsubUser() })
+onUnmounted(() => { 
+  if (unsubUser) unsubUser() 
+  if (unsubLastSender) unsubLastSender()
+})
 </script>
 
 <style scoped>

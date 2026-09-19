@@ -2,7 +2,7 @@
   <div class="settings-page">
     <header class="settings-header">
       <NuxtLink to="/chat" class="btn-icon back-btn" aria-label="Back to chat list">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"/></svg>
+        <Icon name="lucide:arrow-left" size="20" />
       </NuxtLink>
       <h2>Settings</h2>
     </header>
@@ -12,39 +12,43 @@
       <section class="settings-section">
         <h3>Profile</h3>
         <div class="settings-card">
-          <div class="avatar-upload-wrap">
-            <label class="avatar-upload-label" for="settings-avatar-input">
-              <AppAvatar :src="previewUrl || currentUser?.photoURL" :name="currentUser?.displayName" size="xl" />
-              <div class="avatar-upload-overlay">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+          <div class="profile-row">
+            <div class="avatar-upload-wrap">
+              <label class="avatar-upload-label" for="settings-avatar-input" title="Change photo">
+                <AppAvatar :src="previewUrl || currentUser?.photoURL" :name="currentUser?.displayName" size="xl" />
+                <div class="avatar-upload-overlay">
+                  <Icon name="lucide:camera" size="24" color="white" />
+                </div>
+                <input id="settings-avatar-input" type="file" accept="image/*" class="sr-only" @change="onAvatarSelect" />
+              </label>
+            </div>
+            
+            <div class="profile-fields">
+              <div class="form-group">
+                <label class="form-label" for="settings-name">Display Name</label>
+                <input
+                  id="settings-name"
+                  v-model="displayName"
+                  type="text"
+                  class="form-input"
+                  placeholder="Your name"
+                />
               </div>
-              <input id="settings-avatar-input" type="file" accept="image/*" class="sr-only" @change="onAvatarSelect" />
-            </label>
-            <span class="avatar-hint">Click to change photo</span>
-          </div>
-
-          <div class="form-group">
-            <label class="form-label" for="settings-name">Display Name</label>
-            <input
-              id="settings-name"
-              v-model="displayName"
-              type="text"
-              class="form-input"
-              placeholder="Your name"
-            />
-          </div>
-
-          <div class="form-group">
-            <label class="form-label">Email</label>
-            <input :value="currentUser?.email" type="email" class="form-input" disabled />
+              <div class="form-group">
+                <label class="form-label">Email Address</label>
+                <input :value="currentUser?.email" type="email" class="form-input" disabled />
+              </div>
+            </div>
           </div>
           
-          <div v-if="error" class="form-error">{{ error }}</div>
+          <div v-if="error" class="form-error">
+            <Icon name="lucide:alert-circle" size="16" /> {{ error }}
+          </div>
           
           <div class="settings-actions">
             <button class="btn btn-primary" @click="saveProfile" :disabled="saving">
               <AppLoader v-if="saving" size="sm" color="white" />
-              <span v-else>Save Profile</span>
+              <span v-else>Save Changes</span>
             </button>
           </div>
         </div>
@@ -60,6 +64,7 @@
               <span class="setting-desc">Switch between light and dark mode</span>
             </div>
             <button class="btn btn-secondary" @click="toggleTheme">
+              <Icon :name="theme === 'dark' ? 'lucide:sun' : 'lucide:moon'" size="16" style="margin-right:0.5rem" />
               {{ theme === 'dark' ? 'Light Mode' : 'Dark Mode' }}
             </button>
           </div>
@@ -89,8 +94,14 @@
       <!-- Account Section -->
       <section class="settings-section">
         <h3>Account</h3>
-        <div class="settings-card">
-          <button class="btn btn-danger w-full" @click="confirmLogout">Logout</button>
+        <div class="settings-card danger-zone">
+          <div class="setting-item">
+            <div class="setting-info">
+              <span class="setting-title text-danger">Sign Out</span>
+              <span class="setting-desc">Log out of your EzChat account on this device.</span>
+            </div>
+            <button class="btn btn-danger-outline" @click="confirmLogout">Log out</button>
+          </div>
         </div>
       </section>
     </div>
@@ -164,17 +175,24 @@ async function confirmLogout() {
   align-items: center;
   gap: 1rem;
   padding: 1rem 1.5rem;
-  background: var(--color-surface);
+  background: rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
   border-bottom: 1px solid var(--color-border);
   position: sticky;
   top: 0;
   z-index: 10;
 }
 
+html.dark .settings-header {
+  background: rgba(30, 41, 59, 0.8);
+}
+
 .settings-header h2 {
   font-size: var(--font-size-lg);
-  font-weight: 600;
+  font-weight: 700;
   margin: 0;
+  color: var(--color-text);
 }
 
 .back-btn {
@@ -187,13 +205,13 @@ async function confirmLogout() {
 }
 
 .settings-content {
-  padding: 1.5rem;
-  max-width: 600px;
+  padding: 2rem 1.5rem 4rem;
+  max-width: 680px;
   margin: 0 auto;
   width: 100%;
   display: flex;
   flex-direction: column;
-  gap: 2rem;
+  gap: 2.5rem;
 }
 
 .settings-section h3 {
@@ -203,13 +221,32 @@ async function confirmLogout() {
   color: var(--color-text-muted);
   margin-bottom: 0.75rem;
   font-weight: 600;
+  padding-left: 0.5rem;
 }
 
 .settings-card {
   background: var(--color-surface);
   border: 1px solid var(--color-border);
   border-radius: var(--radius-lg);
-  padding: 1.25rem;
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  box-shadow: var(--shadow-sm);
+}
+
+.profile-row {
+  display: flex;
+  gap: 2rem;
+  align-items: flex-start;
+}
+@media (max-width: 600px) {
+  .profile-row { flex-direction: column; align-items: center; gap: 1.5rem; }
+  .profile-fields { width: 100%; }
+}
+
+.profile-fields {
+  flex: 1;
   display: flex;
   flex-direction: column;
   gap: 1rem;
@@ -219,8 +256,6 @@ async function confirmLogout() {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 0.5rem;
-  margin-bottom: 0.5rem;
 }
 
 .avatar-upload-label {
@@ -234,14 +269,14 @@ async function confirmLogout() {
   transition: background var(--transition-base);
 }
 
-.avatar-upload-label:hover .avatar-upload-overlay { background: rgba(0,0,0,0.45); }
-
-.avatar-hint { font-size: var(--font-size-xs); color: var(--color-text-muted); }
+.avatar-upload-label:hover .avatar-upload-overlay { background: rgba(0,0,0,0.5); }
 
 .settings-actions {
   display: flex;
   justify-content: flex-end;
   margin-top: 0.5rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--color-border-light);
 }
 
 .setting-item {
@@ -258,13 +293,38 @@ async function confirmLogout() {
 }
 
 .setting-title {
-  font-weight: 500;
+  font-weight: 600;
   font-size: var(--font-size-base);
+  color: var(--color-text);
 }
 
 .setting-desc {
   font-size: var(--font-size-sm);
   color: var(--color-text-muted);
+}
+
+.danger-zone {
+  border-color: rgba(239, 68, 68, 0.3);
+}
+
+.text-danger {
+  color: var(--color-error);
+}
+
+.btn-danger-outline {
+  background: transparent;
+  border: 1px solid var(--color-error);
+  color: var(--color-error);
+  padding: 0.5rem 1rem;
+  border-radius: var(--radius-md);
+  font-weight: 500;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.btn-danger-outline:hover {
+  background: var(--color-error);
+  color: white;
 }
 
 /* Toggle Switch Styles */
@@ -301,6 +361,7 @@ async function confirmLogout() {
   background-color: white;
   transition: .3s;
   border-radius: 50%;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.2);
 }
 
 input:checked + .slider {
@@ -312,5 +373,4 @@ input:checked + .slider:before {
 }
 
 .mt-2 { margin-top: 0.5rem; }
-.w-full { width: 100%; justify-content: center; }
 </style>

@@ -12,7 +12,7 @@
 
     <div v-else class="messages-list">
       <template v-for="(item, index) in groupedMessages" :key="item.id || item.date">
-        <ChatDateSeparator v-if="item.isDate" :date="item.date" />
+        <ChatDateSeparator v-if="item.isDate" :date="item.date" :same-day="item.isSameDay" />
         <ChatMessageBubble
           v-else
           :message="item"
@@ -100,6 +100,7 @@ const groupedMessages = computed(() => {
   const items = []
   let lastDate = null
   let lastSender = null
+  let lastTime = 0
 
   const clearedAt = props.chat?.clearedAt?.[currentUser.value?.uid]
   const clearTime = clearedAt ? (clearedAt.toDate ? clearedAt.toDate().getTime() : new Date(clearedAt).getTime()) : 0
@@ -109,15 +110,23 @@ const groupedMessages = computed(() => {
     const msgTime = ts?.toDate ? ts.toDate().getTime() : (ts ? new Date(ts).getTime() : Date.now())
     if (clearTime && msgTime <= clearTime) continue
 
-    const date = ts?.toDate ? ts.toDate() : (ts ? new Date(ts) : new Date())
+    const date = new Date(msgTime)
     const dateStr = date.toDateString()
-    if (dateStr !== lastDate) {
-      items.push({ isDate: true, date: dateStr, id: `date-${dateStr}` })
+
+    // Break if day changed, OR if more than 30 minutes (1800000ms) has passed since last message
+    const timeDiff = msgTime - lastTime
+    const significantTimePassed = lastTime !== 0 && timeDiff > 1800000 // 30 mins
+
+    if (dateStr !== lastDate || significantTimePassed) {
+      const isSameDay = dateStr === lastDate;
+      items.push({ isDate: true, date: date.toISOString(), isSameDay, id: `date-${msg.id || msgTime}` })
       lastDate = dateStr
       lastSender = null
     }
-    const isFirstFromSender = msg.senderId !== lastSender
+
+    const isFirstFromSender = msg.senderId !== lastSender || significantTimePassed
     lastSender = msg.senderId
+    lastTime = msgTime
     items.push({ ...msg, isDate: false, isFirstFromSender })
   }
   return items

@@ -5,17 +5,24 @@
 </template>
 
 <script setup>
-const props = defineProps({ date: { type: String, required: true } })
+const props = defineProps({ 
+  date: { type: String, required: true },
+  sameDay: { type: Boolean, default: false }
+})
 
 const formattedDate = computed(() => {
   const d = new Date(props.date)
   const today = new Date()
   const yesterday = new Date(today)
   yesterday.setDate(yesterday.getDate() - 1)
+  
+  const timeStr = d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
 
-  if (d.toDateString() === today.toDateString()) return 'Today'
-  if (d.toDateString() === yesterday.toDateString()) return 'Yesterday'
-  return d.toLocaleDateString([], { weekday: 'long', month: 'long', day: 'numeric' })
+  if (props.sameDay) return timeStr
+
+  if (d.toDateString() === today.toDateString()) return `Today ${timeStr}`
+  if (d.toDateString() === yesterday.toDateString()) return `Yesterday ${timeStr}`
+  return d.toLocaleDateString([], { month: 'short', day: 'numeric', year: 'numeric' }) + `, ${timeStr}`
 })
 </script>
 
