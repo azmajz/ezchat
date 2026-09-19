@@ -8,51 +8,66 @@
    ============================================================ */
 
 /* ── Google Fonts ── */
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,300;0,14..32,400;0,14..32,500;0,14..32,600;0,14..32,700&display=swap');
 
 /* ── Light Theme Variables ── */
 :root {
-  /* Teams Blurple */
-  --color-primary: #5b5fc7;
-  --color-primary-hover: #4f52b2;
-  --color-primary-light: rgba(91, 95, 199, 0.12);
+  /* Primary — rich indigo, deep and saturated */
+  --color-primary: #4f46e5;
+  --color-primary-hover: #4338ca;
+  --color-primary-light: rgba(79, 70, 229, 0.1);
+  --color-primary-subtle: rgba(79, 70, 229, 0.06);
   --color-primary-text: #ffffff;
 
-  --color-surface: #f5f5f5; /* Chat background */
-  --color-surface-2: #ffffff; /* White surfaces */
-  --color-surface-3: #ebebeb; /* Hover surfaces */
-  --color-sidebar: #ffffff; /* Nav rail and Sidebar */
-  --color-sidebar-hover: #f5f5f5;
-  --color-sidebar-active: #ebebeb;
+  /* Surfaces — layered slate-white hierarchy with a warm, barely-there lavender tint */
+  --color-surface: #f3f3f8;       /* Chat area background — slightly cooler, gives message bubbles contrast */
+  --color-surface-2: #ffffff;     /* Sidebar, panels, cards — bright white */
+  --color-surface-3: #eeeef5;     /* Hover state, input backgrounds */
+  --color-surface-4: #e8e8f2;     /* Active / pressed state */
 
-  --color-border: #e0e0e0;
-  --color-border-light: #f5f5f5;
+  /* Sidebar — white with a gentle visual separation */
+  --color-sidebar: #ffffff;
+  --color-sidebar-hover: #f3f3f8;
+  --color-sidebar-active: #ece9fe;  /* Warm indigo tint for active conversation */
 
-  --color-text: #242424;
-  --color-text-secondary: #475569;
-  --color-text-muted: #94a3b8;
+  /* Nav Rail — slightly off-white for structural contrast from sidebar */
+  --color-navrail: #f8f8fc;
+
+  /* Borders — refined slate with a touch of cool tone */
+  --color-border: #dddde8;
+  --color-border-light: #ebebf3;
+  --color-border-strong: #c8c8d8;
+
+  /* Text — sharp hierarchy */
+  --color-text: #1a1a2e;             /* Near-black with a subtle blue undertone */
+  --color-text-secondary: #4a4a6a;   /* Muted slate-indigo */
+  --color-text-muted: #9090b0;       /* Soft, clear muted tone */
   --color-text-inverse: #ffffff;
 
-  /* Premium sent bubble gradient for Light Mode */
-  /* --color-sent-bg: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%); */
-  --color-sent-bg: linear-gradient(135deg, #636dcc 0%, #4f52d1 100%);
+  /* Message bubbles */
+  --color-sent-bg: linear-gradient(145deg, #5b52f0 0%, #4338ca 100%);
   --color-sent-text: #ffffff;
   --color-received-bg: #ffffff;
-  --color-received-text: #242424;
+  --color-received-text: #1a1a2e;
 
-  --color-online: #22c55e;
-  --color-offline: #94a3b8;
+  /* Status */
+  --color-online: #10b981;
+  --color-offline: #9090b0;
   --color-error: #ef4444;
   --color-warning: #f59e0b;
-  --color-success: #22c55e;
+  --color-success: #10b981;
 
-  --color-overlay: rgba(15, 23, 42, 0.5);
-  --color-skeleton: #e2e8f0;
+  --color-overlay: rgba(26, 26, 46, 0.45);
+  --color-skeleton: #e8e8f2;
 
-  --shadow-sm: 0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
-  --shadow-md: 0 4px 16px rgba(0,0,0,0.08), 0 2px 6px rgba(0,0,0,0.04);
-  --shadow-lg: 0 12px 40px rgba(0,0,0,0.12), 0 4px 12px rgba(0,0,0,0.06);
-  --shadow-modal: 0 20px 60px rgba(0,0,0,0.15);
+  /* Shadows — more refined depth for light mode */
+  --shadow-xs: 0 1px 2px rgba(60, 60, 120, 0.06);
+  --shadow-sm: 0 1px 4px rgba(60, 60, 120, 0.08), 0 1px 2px rgba(60, 60, 120, 0.05);
+  --shadow-md: 0 4px 16px rgba(60, 60, 120, 0.1), 0 2px 6px rgba(60, 60, 120, 0.06);
+  --shadow-lg: 0 12px 40px rgba(60, 60, 120, 0.13), 0 4px 14px rgba(60, 60, 120, 0.07);
+  --shadow-modal: 0 24px 64px rgba(26, 26, 80, 0.18), 0 8px 24px rgba(60, 60, 120, 0.1);
+  --shadow-sidebar: 1px 0 0 var(--color-border);
+  --shadow-card: 0 2px 8px rgba(60, 60, 120, 0.08), 0 0 0 1px var(--color-border);
 
   --radius-sm: 6px;
   --radius-md: 12px;
@@ -82,46 +97,55 @@
 
 /* ── Dark Theme Variables ── */
 html.dark {
-  /* Teams Dark Blurple - Higher Contrast */
-  --color-primary: #8a8ff7;
-  --color-primary-hover: #7f85f5;
-  --color-primary-light: rgba(138, 143, 247, 0.15);
+  /* Dark Indigo — more saturated than before */
+  --color-primary: #818cf8;
+  --color-primary-hover: #6366f1;
+  --color-primary-light: rgba(129, 140, 248, 0.15);
+  --color-primary-subtle: rgba(129, 140, 248, 0.08);
   --color-primary-text: #ffffff;
 
-  --color-surface: #121212; /* Darker chat background */
-  --color-surface-2: #1e1e1e; /* Elevated surfaces */
-  --color-surface-3: #2d2d2d; /* Hover surfaces */
-  --color-sidebar: #171717; /* Nav rail and sidebar */
-  --color-sidebar-hover: #242424;
-  --color-sidebar-active: #2d2d2d;
+  --color-surface: #0f0f17;     /* Deep blue-black chat background */
+  --color-surface-2: #17171f;   /* Elevated panels / sidebar */
+  --color-surface-3: #22222e;   /* Hover state */
+  --color-surface-4: #2a2a38;   /* Active / pressed */
 
-  --color-border: #333333;
-  --color-border-light: #1e1e1e;
+  --color-sidebar: #13131a;
+  --color-sidebar-hover: #1e1e28;
+  --color-sidebar-active: #252535;
 
-  --color-text: #ffffff; /* Brighter main text */
-  --color-text-secondary: #b3b3b3;
-  --color-text-muted: #808080;
-  --color-text-inverse: #121212;
+  --color-navrail: #0f0f17;
 
-  /* Premium sent bubble gradient for Dark Mode */
-  --color-sent-bg: linear-gradient(135deg, #818cf8 0%, #6366f1 100%);
+  --color-border: #2a2a3a;
+  --color-border-light: #1e1e28;
+  --color-border-strong: #38384e;
+
+  --color-text: #f0f0ff;
+  --color-text-secondary: #a8a8c8;
+  --color-text-muted: #68688a;
+  --color-text-inverse: #0f0f17;
+
+  /* Dark mode message bubbles */
+  --color-sent-bg: linear-gradient(145deg, #818cf8 0%, #6366f1 100%);
   --color-sent-text: #ffffff;
-  --color-received-bg: #262626; /* Contrast against surface */
-  --color-received-text: #ffffff;
+  --color-received-bg: #22222e;
+  --color-received-text: #f0f0ff;
 
-  --color-online: #4ade80;
-  --color-offline: #64748b;
+  --color-online: #34d399;
+  --color-offline: #68688a;
   --color-error: #f87171;
   --color-warning: #fbbf24;
-  --color-success: #4ade80;
+  --color-success: #34d399;
 
-  --color-overlay: rgba(0, 0, 0, 0.75);
-  --color-skeleton: #263044;
+  --color-overlay: rgba(0, 0, 0, 0.7);
+  --color-skeleton: #22222e;
 
-  --shadow-sm: 0 1px 3px rgba(0,0,0,0.3), 0 1px 2px rgba(0,0,0,0.2);
-  --shadow-md: 0 4px 16px rgba(0,0,0,0.4), 0 2px 6px rgba(0,0,0,0.25);
-  --shadow-lg: 0 12px 40px rgba(0,0,0,0.5), 0 4px 12px rgba(0,0,0,0.3);
-  --shadow-modal: 0 20px 60px rgba(0,0,0,0.6);
+  --shadow-xs: 0 1px 2px rgba(0,0,0,0.3);
+  --shadow-sm: 0 1px 4px rgba(0,0,0,0.35), 0 1px 2px rgba(0,0,0,0.25);
+  --shadow-md: 0 4px 16px rgba(0,0,0,0.45), 0 2px 6px rgba(0,0,0,0.3);
+  --shadow-lg: 0 12px 40px rgba(0,0,0,0.55), 0 4px 14px rgba(0,0,0,0.35);
+  --shadow-modal: 0 24px 64px rgba(0,0,0,0.65), 0 8px 24px rgba(0,0,0,0.45);
+  --shadow-sidebar: 1px 0 0 var(--color-border);
+  --shadow-card: 0 2px 8px rgba(0,0,0,0.3), 0 0 0 1px var(--color-border);
 }
 
 /* ── Reset ── */
@@ -260,14 +284,16 @@ h1, h2, h3, h4 {
 .btn-primary {
   background: var(--color-primary);
   color: var(--color-primary-text);
+  letter-spacing: 0.01em;
 }
 .btn-primary:hover:not(:disabled) {
   background: var(--color-primary-hover);
   transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(99,102,241,0.4);
+  box-shadow: 0 4px 14px rgba(79, 70, 229, 0.45);
 }
 .btn-primary:active:not(:disabled) {
   transform: translateY(0);
+  box-shadow: none;
 }
 
 .btn-secondary {

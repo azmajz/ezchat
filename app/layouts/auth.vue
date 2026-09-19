@@ -67,15 +67,19 @@ html.dark .auth-blob {
 }
 
 .auth-container {
-  background: var(--color-surface);
+  background: var(--color-surface-2);
   border: 1px solid var(--color-border);
   border-radius: var(--radius-xl);
-  padding: 2.5rem;
+  padding: 3rem 2.5rem;
   width: 100%;
-  max-width: 420px;
-  box-shadow: var(--shadow-modal);
+  max-width: 440px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.02), 0 10px 30px rgba(60, 60, 120, 0.08), 0 0 0 1px var(--color-border);
   position: relative;
   z-index: 1;
+}
+
+html.dark .auth-container {
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2), 0 10px 30px rgba(0, 0, 0, 0.4), 0 0 0 1px var(--color-border);
 }
 
 .auth-brand {
@@ -83,13 +87,13 @@ html.dark .auth-blob {
   align-items: center;
   justify-content: center;
   gap: 0.75rem;
-  margin-bottom: 0.5rem;
+  margin-bottom: 1.5rem;
 }
 
 .auth-brand-name {
-  display: none !important;
-  font-size: var(--font-size-xl);
-  font-weight: 700;
+  font-size: 1.75rem;
+  font-weight: 800;
   color: var(--color-text);
+  letter-spacing: -0.02em;
 }
 </style>

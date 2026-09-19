@@ -69,7 +69,7 @@ onUnmounted(() => unsubscribeChats())
   border-right: 1px solid var(--color-border);
   display: flex;
   flex-direction: column;
-  background: var(--color-surface-2);
+  background: var(--color-navrail);
   z-index: 10;
 }
 
@@ -90,6 +90,7 @@ onUnmounted(() => unsubscribeChats())
   flex-direction: column;
   min-width: 0;
   overflow: hidden;
+  background: var(--color-surface);
 }
 
 /* Mobile layout — full screen panels, one at a time */

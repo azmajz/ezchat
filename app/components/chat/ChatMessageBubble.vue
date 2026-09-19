@@ -163,12 +163,12 @@ const formattedTime = computed(() => {
   display: flex;
   align-items: flex-end;
   gap: 0.5rem;
-  max-width: 85%;
+  max-width: 82%;
   animation: messagePop 180ms ease forwards;
 }
 
 .message-wrap.first-in-group {
-  margin-top: 0.75rem;
+  margin-top: 0.875rem;
 }
 
 .message-wrap.own {
@@ -181,7 +181,7 @@ const formattedTime = computed(() => {
 }
 
 .message-avatar {
-  width: 36px;
+  width: 34px;
   flex-shrink: 0;
   display: flex;
   justify-content: center;
@@ -206,7 +206,8 @@ const formattedTime = computed(() => {
   font-weight: 600;
   color: var(--color-primary);
   margin-bottom: 0.25rem;
-  padding-left: 0.25rem;
+  padding-left: 0.75rem;
+  letter-spacing: 0.01em;
 }
 
 .bubble-row {
@@ -219,23 +220,28 @@ const formattedTime = computed(() => {
 .message-wrap.own .bubble-row { flex-direction: row-reverse; }
 
 .bubble {
-  padding: 0.625rem 0.875rem;
+  padding: 0.5625rem 0.875rem;
   border-radius: var(--radius-lg);
   max-width: 100%;
   position: relative;
 }
 
+/* Sent bubble — rich indigo gradient */
 .bubble-sent {
   background: var(--color-sent-bg);
   color: var(--color-sent-text);
   border-bottom-right-radius: var(--radius-sm);
+  box-shadow: 0 2px 8px rgba(79, 70, 229, 0.25);
 }
 
+/* Received bubble — clean white card with subtle depth */
 .bubble-received {
   background: var(--color-received-bg);
   color: var(--color-received-text);
   border-bottom-left-radius: var(--radius-sm);
   border-top-left-radius: var(--radius-sm);
+  border: 1px solid var(--color-border);
+  box-shadow: var(--shadow-xs);
 }
 
 .message-wrap.other.first-in-group .bubble-received {
@@ -249,33 +255,36 @@ const formattedTime = computed(() => {
 
 .bubble-text {
   font-size: var(--font-size-sm);
-  line-height: 1.55;
+  line-height: 1.6;
   white-space: pre-wrap;
   word-break: break-word;
-  margin-bottom: 0.25rem;
+  margin-bottom: 0.2rem;
 }
 
 .bubble-time {
   display: block;
   font-size: 10px;
-  opacity: 0.65;
+  opacity: 0.6;
   text-align: right;
-  margin-top: 0.125rem;
+  margin-top: 0.15rem;
+  letter-spacing: 0.01em;
 }
 
-.bubble-sent .bubble-time { color: rgba(255,255,255,0.75); }
+.bubble-sent .bubble-time { color: rgba(255,255,255,0.8); opacity: 1; }
+.bubble-received .bubble-time { color: var(--color-text-muted); }
 
+/* Hover Action Bar */
 .bubble-actions-container {
   position: absolute;
-  top: -16px;
+  top: -18px;
   right: 0;
   display: flex;
   align-items: center;
-  background: var(--color-surface);
+  background: var(--color-surface-2);
   border: 1px solid var(--color-border);
-  border-radius: 6px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-  padding: 0.125rem;
+  border-radius: 8px;
+  box-shadow: var(--shadow-md);
+  padding: 0.15rem;
   z-index: 10;
 }
 
@@ -286,15 +295,15 @@ const formattedTime = computed(() => {
 
 .quick-reactions {
   display: flex;
-  gap: 0.125rem;
-  padding: 0 0.25rem;
+  gap: 0.1rem;
+  padding: 0 0.2rem;
 }
 
 .react-icon-btn {
   width: 28px;
   height: 28px;
-  border-radius: 4px;
-  font-size: 16px;
+  border-radius: 5px;
+  font-size: 15px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -305,8 +314,8 @@ const formattedTime = computed(() => {
 }
 
 .react-icon-btn:hover {
-  background: var(--color-surface-hover);
-  transform: scale(1.15);
+  background: var(--color-surface-3);
+  transform: scale(1.2);
 }
 
 .more-options-wrap {
@@ -319,13 +328,13 @@ const formattedTime = computed(() => {
   width: 1px;
   height: 16px;
   background: var(--color-border);
-  margin: 0 0.25rem;
+  margin: 0 0.2rem;
 }
 
 .more-btn {
   width: 28px; height: 28px;
   flex-shrink: 0;
-  border-radius: 4px;
+  border-radius: 5px;
   color: var(--color-text-secondary);
   transition: all var(--transition-fast);
 }
@@ -336,14 +345,14 @@ const formattedTime = computed(() => {
   position: absolute;
   top: calc(100% + 4px);
   right: 0;
-  background: var(--color-surface);
+  background: var(--color-surface-2);
   border: 1px solid var(--color-border);
-  border-radius: 8px;
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-lg);
   padding: 0.25rem;
   display: flex;
   flex-direction: column;
-  min-width: 140px;
+  min-width: 148px;
   z-index: 20;
 }
 
@@ -355,7 +364,7 @@ const formattedTime = computed(() => {
   padding: 0.5rem 0.75rem;
   border: none;
   background: none;
-  border-radius: 4px;
+  border-radius: var(--radius-sm);
   font-size: var(--font-size-sm);
   color: var(--color-text);
   cursor: pointer;
@@ -363,47 +372,47 @@ const formattedTime = computed(() => {
   transition: background var(--transition-fast);
 }
 
-.dropdown-item:hover { background: var(--color-surface-hover); }
+.dropdown-item:hover { background: var(--color-surface-3); }
 
 .dropdown-item.danger { color: var(--color-error); }
-.dropdown-item.danger:hover { background: rgba(239, 68, 68, 0.1); }
+.dropdown-item.danger:hover { background: rgba(239, 68, 68, 0.07); }
 
 /* Reactions Display */
 .reactions-display {
   display: flex;
   flex-wrap: wrap;
   gap: 0.25rem;
-  margin-top: -12px;
+  margin-top: -10px;
   z-index: 5;
   position: relative;
   max-width: 90%;
 }
 
 .message-wrap.own .reactions-display {
-  margin-right: 12px;
+  margin-right: 10px;
   justify-content: flex-end;
 }
 
 .message-wrap.other .reactions-display {
-  margin-left: 12px;
+  margin-left: 10px;
   justify-content: flex-start;
 }
 
 .reaction-badge {
   display: inline-flex;
   align-items: center;
-  gap: 0.35rem;
-  background: var(--color-surface);
+  gap: 0.3rem;
+  background: var(--color-surface-2);
   border: 1px solid var(--color-border);
   border-radius: 16px;
-  padding: 0.2rem 0.4rem;
+  padding: 0.175rem 0.45rem;
   font-size: 11px;
   font-weight: 600;
   line-height: 1;
   color: var(--color-text-secondary);
-  box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+  box-shadow: var(--shadow-xs);
   cursor: pointer;
-  transition: transform 150ms ease, background 150ms ease, border-color 150ms ease;
+  transition: transform 150ms ease, background 150ms ease, border-color 150ms ease, box-shadow 150ms ease;
   user-select: none;
   animation: reactionPop 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
   transform-origin: center bottom;
@@ -437,21 +446,21 @@ const formattedTime = computed(() => {
 
 .reaction-badge:hover {
   transform: scale(1.08);
-  background: var(--color-surface-hover);
-  box-shadow: 0 3px 8px rgba(0,0,0,0.12);
+  background: var(--color-surface-3);
+  box-shadow: var(--shadow-sm);
 }
 
 .reaction-badge.active {
-  background: var(--color-surface);
+  background: var(--color-primary-subtle);
   border-color: var(--color-primary);
   color: var(--color-primary);
-  box-shadow: 0 0 0 1px var(--color-primary), 0 2px 4px rgba(0,0,0,0.05);
+  box-shadow: 0 0 0 1px var(--color-primary-light);
 }
 
 .fade-quick-enter-active, .fade-quick-leave-active { transition: opacity 100ms; }
 .fade-quick-enter-from, .fade-quick-leave-to { opacity: 0; }
 
 @media (max-width: 767px) {
-  .message-wrap { max-width: 95%; }
+  .message-wrap { max-width: 92%; }
 }
 </style>

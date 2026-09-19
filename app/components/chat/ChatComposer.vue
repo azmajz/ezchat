@@ -181,8 +181,10 @@ async function send() {
 <style scoped>
 .composer {
   border-top: 1px solid var(--color-border);
-  background: var(--color-surface);
+  background: var(--color-surface-2);
   flex-shrink: 0;
+  /* Subtle glow upward */
+  box-shadow: 0 -1px 0 var(--color-border), 0 -2px 10px rgba(60, 60, 120, 0.04);
 }
 
 .edit-bar {
@@ -190,10 +192,11 @@ async function send() {
   align-items: center;
   justify-content: space-between;
   padding: 0.5rem 1rem;
-  background: var(--color-surface-2);
-  border-bottom: 1px solid var(--color-border);
-  color: var(--color-text-secondary);
+  background: var(--color-primary-subtle);
+  border-bottom: 1px solid var(--color-primary-light);
+  color: var(--color-primary);
   font-size: var(--font-size-sm);
+  font-weight: 500;
 }
 .edit-bar-info {
   display: flex;
@@ -244,6 +247,7 @@ async function send() {
   align-items: center;
   gap: 0.5rem;
   background: var(--color-surface-3);
+  border: 1px solid var(--color-border);
   padding: 0.375rem 0.75rem;
   border-radius: var(--radius-md);
   font-size: var(--font-size-sm);
@@ -267,14 +271,16 @@ async function send() {
   display: flex;
   align-items: flex-end;
   gap: 0.5rem;
-  padding: 0.75rem;
+  padding: 0.625rem 0.875rem;
 }
 
 .attach-btn {
   color: var(--color-text-muted);
   cursor: pointer;
   flex-shrink: 0;
-  width: 40px; height: 40px;
+  width: 38px; height: 38px;
+  border-radius: var(--radius-full);
+  transition: all var(--transition-fast);
 }
 
 .attach-btn:hover { color: var(--color-primary); background: var(--color-primary-light); }
@@ -283,15 +289,15 @@ async function send() {
   flex: 1;
   resize: none;
   border: 1.5px solid var(--color-border);
-  border-radius: var(--radius-lg);
-  padding: 0.625rem 1rem;
-  background: var(--color-surface-2);
+  border-radius: var(--radius-xl);
+  padding: 0.5625rem 1rem;
+  background: var(--color-surface-3);
   color: var(--color-text);
   font-size: var(--font-size-base);
   line-height: 1.5;
   max-height: 120px;
   overflow-y: auto;
-  transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+  transition: border-color var(--transition-fast), box-shadow var(--transition-fast), background var(--transition-fast);
   -ms-overflow-style: none;
   scrollbar-width: none;
 }
@@ -302,15 +308,17 @@ async function send() {
 .composer-input:focus {
   border-color: var(--color-primary);
   box-shadow: 0 0 0 3px var(--color-primary-light);
+  background: var(--color-surface-2);
+  outline: none;
 }
 
 .composer-input::placeholder { color: var(--color-text-muted); }
 
 .send-btn {
-  width: 40px; height: 40px;
+  width: 38px; height: 38px;
   border-radius: 50%;
   border: none;
-  background: var(--color-border);
+  background: var(--color-surface-4);
   color: var(--color-text-muted);
   display: flex; align-items: center; justify-content: center;
   flex-shrink: 0;
@@ -322,14 +330,15 @@ async function send() {
   background: var(--color-primary);
   color: white;
   transform: scale(1.05);
-  box-shadow: 0 4px 12px rgba(99,102,241,0.4);
+  box-shadow: 0 4px 14px rgba(79, 70, 229, 0.45);
 }
 
 .send-btn.active:hover {
   background: var(--color-primary-hover);
+  transform: scale(1.08);
 }
 
-.send-btn:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+.send-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; box-shadow: none; }
 
 .slide-down-enter-active, .slide-down-leave-active { transition: all 200ms ease; }
 .slide-down-enter-from, .slide-down-leave-to { opacity: 0; transform: translateY(-4px); }

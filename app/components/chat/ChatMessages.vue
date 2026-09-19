@@ -171,10 +171,14 @@ onMounted(() => {
 .messages-container {
   flex: 1;
   overflow-y: auto;
-  padding: 1rem 1rem 0 1rem;
+  padding: 0.75rem 1.25rem 0 1.25rem;
   display: flex;
   flex-direction: column;
   gap: 0.25rem;
+  /* Subtle dotted grid pattern for a premium chat feel */
+  background-image: radial-gradient(circle, var(--color-border-light) 1px, transparent 1px);
+  background-size: 24px 24px;
+  background-color: var(--color-surface);
 }
 
 .messages-loading, .messages-empty {
@@ -186,6 +190,12 @@ onMounted(() => {
   gap: 0.75rem;
   color: var(--color-text-muted);
   font-size: var(--font-size-sm);
+}
+
+.messages-empty p {
+  font-size: var(--font-size-base);
+  font-weight: 500;
+  color: var(--color-text-secondary);
 }
 
 .messages-empty span {

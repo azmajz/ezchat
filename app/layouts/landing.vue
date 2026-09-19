@@ -16,7 +16,10 @@
         </NuxtLink>
         <nav class="header-nav">
           <button class="btn btn-icon theme-btn" @click="toggleTheme" :title="theme === 'dark' ? 'Light Mode' : 'Dark Mode'">
-            <Icon :name="theme === 'dark' ? 'lucide:sun' : 'lucide:moon'" size="20" />
+            <ClientOnly fallback-tag="span">
+              <Icon v-if="theme === 'dark'" name="lucide:sun" size="20" />
+              <Icon v-else name="lucide:moon" size="20" />
+            </ClientOnly>
           </button>
           <NuxtLink to="/login" class="btn btn-ghost">Login</NuxtLink>
           <NuxtLink to="/register" class="btn btn-primary">Get Started</NuxtLink>

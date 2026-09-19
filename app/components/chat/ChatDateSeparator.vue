@@ -31,14 +31,18 @@ const formattedDate = computed(() => {
   display: flex;
   align-items: center;
   justify-content: center;
-  margin: 1rem 0 0.5rem;
+  margin: 1.125rem 0 0.625rem;
 }
 .date-label {
-  font-size: var(--font-size-xs);
-  font-weight: 500;
+  font-size: 10.5px;
+  font-weight: 600;
   color: var(--color-text-muted);
-  background: var(--color-surface-3);
-  padding: 0.3rem 0.875rem;
+  background: var(--color-surface-2);
+  border: 1px solid var(--color-border);
+  padding: 0.275rem 0.875rem;
   border-radius: var(--radius-full);
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  box-shadow: var(--shadow-xs);
 }
 </style>

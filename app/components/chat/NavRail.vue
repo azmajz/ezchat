@@ -79,7 +79,7 @@ async function handleLogout() {
 .nav-rail {
   width: var(--nav-rail-width);
   height: 100%;
-  background: var(--color-surface-2); /* slightly different from sidebar to distinguish */
+  background: var(--color-navrail);
   border-right: 1px solid var(--color-border);
   display: flex;
   flex-direction: column;
@@ -137,6 +137,7 @@ async function handleLogout() {
 
 .nav-rail-item.active {
   color: var(--color-primary);
+  font-weight: 600;
 }
 
 .nav-rail-item.active::before {
