@@ -405,10 +405,30 @@ const formattedTime = computed(() => {
   cursor: pointer;
   transition: transform 150ms ease, background 150ms ease, border-color 150ms ease;
   user-select: none;
+  animation: reactionPop 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+  transform-origin: center bottom;
+}
+
+@keyframes reactionPop {
+  0% { transform: scale(0.5); opacity: 0; }
+  100% { transform: scale(1); opacity: 1; }
 }
 
 .reaction-emoji {
   font-size: 13px;
+  display: inline-block;
+}
+
+.reaction-badge.active .reaction-emoji {
+  animation: emojiWiggle 0.4s ease-in-out;
+}
+
+@keyframes emojiWiggle {
+  0% { transform: rotate(0deg) scale(1); }
+  25% { transform: rotate(-15deg) scale(1.2); }
+  50% { transform: rotate(15deg) scale(1.2); }
+  75% { transform: rotate(-10deg) scale(1.1); }
+  100% { transform: rotate(0deg) scale(1); }
 }
 
 .reaction-count {

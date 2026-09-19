@@ -6,7 +6,7 @@
       <div v-if="isAdmin" class="member-role">Admin</div>
     </div>
     <button v-if="canRemove" @click="$emit('remove')" class="btn-icon remove-btn" title="Remove member">
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      <Icon name="lucide:x" size="16" />
     </button>
   </div>
 </template>
@@ -34,8 +34,14 @@ onMounted(async () => {
 .member-row-inner {
   display: flex;
   align-items: center;
-  gap: 0.75rem;
-  padding: 0.5rem 0;
+  gap: 0.875rem;
+  padding: 0.5rem 0.75rem;
+  margin: 0 -0.75rem;
+  border-radius: var(--radius-md);
+  transition: background var(--transition-fast);
+}
+.member-row-inner:hover {
+  background: var(--color-surface-3);
 }
 .member-info {
   flex: 1;

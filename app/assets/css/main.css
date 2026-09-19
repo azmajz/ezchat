@@ -33,7 +33,9 @@
   --color-text-muted: #94a3b8;
   --color-text-inverse: #ffffff;
 
-  --color-sent-bg: #5b5fc7;
+  /* Premium sent bubble gradient for Light Mode */
+  /* --color-sent-bg: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%); */
+  --color-sent-bg: linear-gradient(135deg, #636dcc 0%, #4f52d1 100%);
   --color-sent-text: #ffffff;
   --color-received-bg: #ffffff;
   --color-received-text: #242424;
@@ -80,31 +82,32 @@
 
 /* ── Dark Theme Variables ── */
 html.dark {
-  /* Teams Dark Blurple */
-  --color-primary: #7f85f5;
-  --color-primary-hover: #6a6fda;
-  --color-primary-light: rgba(127, 133, 245, 0.15);
+  /* Teams Dark Blurple - Higher Contrast */
+  --color-primary: #8a8ff7;
+  --color-primary-hover: #7f85f5;
+  --color-primary-light: rgba(138, 143, 247, 0.15);
   --color-primary-text: #ffffff;
 
-  --color-surface: #201f1f; /* Dark chat background */
-  --color-surface-2: #292929; /* Dark white surfaces */
-  --color-surface-3: #3d3d3d; /* Dark hover surfaces */
-  --color-sidebar: #292929; /* Nav rail and sidebar */
-  --color-sidebar-hover: #333333;
-  --color-sidebar-active: #3d3d3d;
+  --color-surface: #121212; /* Darker chat background */
+  --color-surface-2: #1e1e1e; /* Elevated surfaces */
+  --color-surface-3: #2d2d2d; /* Hover surfaces */
+  --color-sidebar: #171717; /* Nav rail and sidebar */
+  --color-sidebar-hover: #242424;
+  --color-sidebar-active: #2d2d2d;
 
-  --color-border: #3d3d3d;
-  --color-border-light: #292929;
+  --color-border: #333333;
+  --color-border-light: #1e1e1e;
 
-  --color-text: #f5f5f5;
-  --color-text-secondary: #a6a6a6;
-  --color-text-muted: #8a8a8a;
-  --color-text-inverse: #242424;
+  --color-text: #ffffff; /* Brighter main text */
+  --color-text-secondary: #b3b3b3;
+  --color-text-muted: #808080;
+  --color-text-inverse: #121212;
 
-  --color-sent-bg: #7f85f5;
+  /* Premium sent bubble gradient for Dark Mode */
+  --color-sent-bg: linear-gradient(135deg, #818cf8 0%, #6366f1 100%);
   --color-sent-text: #ffffff;
-  --color-received-bg: #292929;
-  --color-received-text: #f5f5f5;
+  --color-received-bg: #262626; /* Contrast against surface */
+  --color-received-text: #ffffff;
 
   --color-online: #4ade80;
   --color-offline: #64748b;
@@ -112,7 +115,7 @@ html.dark {
   --color-warning: #fbbf24;
   --color-success: #4ade80;
 
-  --color-overlay: rgba(0, 0, 0, 0.65);
+  --color-overlay: rgba(0, 0, 0, 0.75);
   --color-skeleton: #263044;
 
   --shadow-sm: 0 1px 3px rgba(0,0,0,0.3), 0 1px 2px rgba(0,0,0,0.2);
