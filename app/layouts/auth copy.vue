@@ -67,33 +67,29 @@ html.dark .auth-blob {
 }
 
 .auth-container {
-  background: var(--color-surface-2);
-  /* border: 1px solid var(--color-border); */
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
   border-radius: var(--radius-xl);
   padding: 2.5rem;
   width: 100%;
-  max-width: 440px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.01), 0 10px 30px rgba(60, 60, 120, 0.04), 0 0 0 1px var(--color-border);
+  max-width: 420px;
+  box-shadow: var(--shadow-modal);
   position: relative;
   z-index: 1;
 }
 
-html.dark .auth-container {
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2), 0 10px 30px rgba(0, 0, 0, 0.4), 0 0 0 1px var(--color-border);
+.auth-brand {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  margin-bottom: 0.5rem;
 }
 
-.auth-brand {
-	display: flex;
-	align-items: center;
-	justify-content: center;
-	gap: 0.5rem;
-	margin-bottom: 1.5rem;
-	padding-right: 25px;
-}
 .auth-brand-name {
-  font-size: 1.75rem;
-  font-weight: 800;
+  display: none !important;
+  font-size: var(--font-size-xl);
+  font-weight: 700;
   color: var(--color-text);
-  letter-spacing: -0.02em;
 }
 </style>

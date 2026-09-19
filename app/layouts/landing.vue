@@ -15,14 +15,12 @@
           <span class="brand-name">EzChat</span>
         </NuxtLink>
         <nav class="header-nav">
-          <button class="btn btn-icon theme-btn" @click="toggleTheme" :title="theme === 'dark' ? 'Light Mode' : 'Dark Mode'">
-            <ClientOnly fallback-tag="span">
-              <Icon v-if="theme === 'dark'" name="lucide:sun" size="20" />
-              <Icon v-else name="lucide:moon" size="20" />
-            </ClientOnly>
-          </button>
           <NuxtLink to="/login" class="btn btn-ghost">Login</NuxtLink>
           <NuxtLink to="/register" class="btn btn-primary">Get Started</NuxtLink>
+          <button class="btn btn-secondary theme-btn" @click="toggleTheme" :title="theme === 'dark' ? 'Switch to Light' : 'Switch to Dark'">
+            <Icon :name="theme === 'dark' ? 'lucide:sun' : 'lucide:moon'" size="16" />
+            {{ theme === 'dark' ? 'Light' : 'Dark' }}
+          </button>
         </nav>
       </div>
     </header>
