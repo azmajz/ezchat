@@ -22,7 +22,13 @@
         <span class="item-preview">
           <span v-if="chat.lastMessageSenderId === currentUser?.uid" style="font-weight: 500;">You: </span>
           <span v-else-if="chat.type === 'group' && lastSenderName" style="font-weight: 500;">{{ lastSenderName }}: </span>
-          {{ chat.lastMessage || 'No messages yet' }}
+          <template v-if="chat.lastMessage?.startsWith('📎 ')">
+            <Icon name="lucide:paperclip" size="13" style="vertical-align: -2px; margin-right: 2px;" />
+            {{ chat.lastMessage.substring(2) }}
+          </template>
+          <template v-else>
+            {{ chat.lastMessage || 'No messages yet' }}
+          </template>
         </span>
         <span v-if="unreadCount > 0" class="badge">{{ unreadCount > 99 ? '99+' : unreadCount }}</span>
       </div>

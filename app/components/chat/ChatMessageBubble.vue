@@ -24,7 +24,7 @@
           </template>
 
           <!-- Image message -->
-          <ChatImageMessage v-else-if="message.type === 'image'" :message="message" />
+          <ChatImageMessage v-else-if="message.type === 'image'" :message="message" @image-loaded="$emit('image-loaded')" />
 
           <!-- File message -->
           <ChatFileMessage v-else-if="message.type === 'file'" :message="message" :is-own="isOwn" />
@@ -104,7 +104,7 @@ const props = defineProps({
   isFirstFromSender: { type: Boolean, default: true },
   getParticipant: { type: Function, default: null },
 })
-const emit = defineEmits(['delete', 'edit', 'react'])
+const emit = defineEmits(['delete', 'edit', 'react', 'image-loaded'])
 
 const { currentUser } = useAuth()
 

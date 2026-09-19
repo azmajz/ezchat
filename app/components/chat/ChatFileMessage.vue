@@ -1,17 +1,17 @@
 <template>
   <div class="file-message" :class="isOwn ? 'file-own' : 'file-other'" @click="handleDownload">
     <div class="file-icon">
-      <component :is="fileIcon" />
+      <Icon :name="fileIcon" size="24" />
     </div>
     <div class="file-info">
       <span class="file-name">{{ message.fileName || 'File' }}</span>
       <span class="file-size">{{ formattedSize }}</span>
     </div>
     <div class="file-download" v-if="!isDownloading">
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+      <Icon name="lucide:download" size="16" />
     </div>
     <div class="file-download" v-else>
-      <svg class="spinner" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg>
+      <Icon name="lucide:loader-2" class="spinner" size="16" />
     </div>
   </div>
 </template>
@@ -66,21 +66,13 @@ const formattedSize = computed(() => {
 const fileIcon = computed(() => {
   const mime = props.message.mimeType || ''
   const name = props.message.fileName || ''
-  if (mime.startsWith('image/')) return IconImage
-  if (mime === 'application/pdf' || name.endsWith('.pdf')) return IconPdf
-  if (name.match(/\.(doc|docx)$/i)) return IconDoc
-  if (name.match(/\.(xls|xlsx)$/i)) return IconSheet
-  if (name.endsWith('.zip') || name.endsWith('.rar')) return IconZip
-  return IconFile
+  if (mime.startsWith('image/')) return 'lucide:image'
+  if (mime === 'application/pdf' || name.endsWith('.pdf')) return 'lucide:file-text'
+  if (name.match(/\.(doc|docx)$/i)) return 'lucide:file-text'
+  if (name.match(/\.(xls|xlsx)$/i)) return 'lucide:file-spreadsheet'
+  if (name.endsWith('.zip') || name.endsWith('.rar')) return 'lucide:archive'
+  return 'lucide:file'
 })
-
-// Inline icon components
-const IconFile = { template: `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>` }
-const IconPdf = { template: `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="1.5"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M8 12h2a2 2 0 0 0 0-4H8v6m8-6h-2v6m-1-3h2" stroke-linecap="round"/></svg>` }
-const IconDoc = { template: `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#3b82f6" stroke-width="1.5"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>` }
-const IconSheet = { template: `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="1.5"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><line x1="8" y1="13" x2="16" y2="13"/><line x1="8" y1="17" x2="16" y2="17"/><line x1="12" y1="9" x2="12" y2="21"/></svg>` }
-const IconZip = { template: `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" stroke-width="1.5"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><line x1="12" y1="11" x2="12" y2="17"/><polyline points="9 11 12 8 15 11"/></svg>` }
-const IconImage = { template: `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#8b5cf6" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>` }
 </script>
 
 <style scoped>

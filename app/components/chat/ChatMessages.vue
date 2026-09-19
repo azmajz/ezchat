@@ -24,6 +24,7 @@
           @delete="$emit('delete-message', item.id)"
           @edit="$emit('edit-message', item)"
           @react="(emoji) => $emit('react-message', item.id, emoji)"
+          @image-loaded="scrollToBottom(true)"
         />
       </template>
 

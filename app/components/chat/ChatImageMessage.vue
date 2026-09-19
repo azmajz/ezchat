@@ -5,10 +5,11 @@
       :alt="message.fileName || 'Image'"
       class="img-preview"
       @click="lightboxOpen = true"
+      @load="$emit('image-loaded')"
       loading="lazy"
     />
     <div class="img-overlay" @click="lightboxOpen = true">
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/><line x1="11" y1="8" x2="11" y2="14"/><line x1="8" y1="11" x2="14" y2="11"/></svg>
+      <Icon name="lucide:zoom-in" size="20" style="color: white;" />
     </div>
   </div>
 
@@ -17,12 +18,12 @@
     <Transition name="modal">
       <div v-if="lightboxOpen" class="lightbox" @click.self="lightboxOpen = false">
         <button class="lightbox-close btn-icon" @click="lightboxOpen = false">
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+          <Icon name="lucide:x" size="22" />
         </button>
         <img :src="message.fileUrl" :alt="message.fileName" class="lightbox-img" />
         <button class="lightbox-download btn btn-secondary" @click="handleDownload" :disabled="isDownloading">
-          <svg v-if="!isDownloading" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-          <svg v-else class="spinner" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg>
+          <Icon v-if="!isDownloading" name="lucide:download" size="16" />
+          <Icon v-else name="lucide:loader-2" class="spinner" size="16" />
           {{ isDownloading ? 'Downloading...' : 'Download' }}
         </button>
       </div>
@@ -32,6 +33,7 @@
 
 <script setup>
 const props = defineProps({ message: { type: Object, required: true } })
+defineEmits(['image-loaded'])
 const lightboxOpen = ref(false)
 const isDownloading = ref(false)
 
