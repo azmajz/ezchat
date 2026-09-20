@@ -1,5 +1,4 @@
 import {
-  getAuth,
   onAuthStateChanged,
   signInWithEmailAndPassword,
   createUserWithEmailAndPassword,
@@ -7,26 +6,22 @@ import {
   GoogleAuthProvider,
   signOut,
   updateProfile,
+  sendEmailVerification,
 } from 'firebase/auth'
 import {
-  getFirestore,
   doc,
   setDoc,
   updateDoc,
   serverTimestamp,
 } from 'firebase/firestore'
-
-let _auth = null
-let _db = null
+import { auth, db } from '~/plugins/firebase.client'
 
 function getFirebaseAuth() {
-  if (!_auth) _auth = getAuth()
-  return _auth
+  return auth
 }
 
 function getFirebaseDb() {
-  if (!_db) _db = getFirestore()
-  return _db
+  return db
 }
 
 // Shared reactive state (module-level singletons)
@@ -60,7 +55,10 @@ export function useAuth() {
     unsubscribeAuth = onAuthStateChanged(auth, async (user) => {
       if (user) {
         currentUser.value = user
-        await upsertUserDoc(user)
+        // Only write Firestore doc once email is verified (or for OAuth users who are always verified)
+        if (user.emailVerified || user.providerData?.[0]?.providerId !== 'password') {
+          await upsertUserDoc(user)
+        }
       } else {
         currentUser.value = null
       }
@@ -72,9 +70,19 @@ export function useAuth() {
     const auth = getFirebaseAuth()
     const credential = await createUserWithEmailAndPassword(auth, email, password)
     await updateProfile(credential.user, { displayName })
-    await upsertUserDoc({ ...credential.user, displayName })
+    // Send verification email before anything else
+    await sendEmailVerification(credential.user)
+    // Don't upsert Firestore doc yet — wait until email is verified
     currentUser.value = auth.currentUser
     return credential.user
+  }
+
+  async function sendVerificationEmail() {
+    const auth = getFirebaseAuth()
+    const user = auth.currentUser
+    if (user && !user.emailVerified) {
+      await sendEmailVerification(user)
+    }
   }
 
   async function signInWithEmail(email, password) {
@@ -132,6 +140,7 @@ export function useAuth() {
     registerWithEmail,
     signInWithEmail,
     signInWithGoogle,
+    sendVerificationEmail,
     logout,
     updateUserProfile,
   }

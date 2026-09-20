@@ -97,7 +97,7 @@ async function handleRegister() {
   loading.value = true
   try {
     await registerWithEmail(email.value, password.value, displayName.value)
-    router.push('/chat')
+    router.push('/verify-email')
   } catch (e) {
     error.value = getFriendlyError(e.code)
   } finally {

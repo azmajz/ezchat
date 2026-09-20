@@ -10,6 +10,13 @@ export default defineNuxtRouteMiddleware(async () => {
   }
 
   if (currentUser.value) {
+    const user = currentUser.value
+    const isEmailProvider = user.providerData?.[0]?.providerId === 'password'
+    // Unverified email users should land on verify-email, not chat
+    if (isEmailProvider && !user.emailVerified) {
+      return navigateTo('/verify-email')
+    }
     return navigateTo('/chat')
   }
 })
+

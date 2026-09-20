@@ -14,11 +14,11 @@
     <p class="empty-subtitle">Select a chat from the left, or start a new conversation to connect.</p>
     <div class="empty-actions">
       <button class="btn btn-primary" @click="showSearchModal = true">
-        <Icon name="lucide:search" size="18" style="margin-right: 0.5rem;" />
+        <Icon name="lucide:search" size="18" />
         Find People
       </button>
       <button class="btn btn-secondary" @click="showGroupCreateModal = true">
-        <Icon name="lucide:users" size="18" style="margin-right: 0.5rem;" />
+        <Icon name="lucide:users" size="18" />
         Create Group
       </button>
     </div>

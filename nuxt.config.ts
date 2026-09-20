@@ -32,6 +32,7 @@ export default defineNuxtConfig({
         { name: 'viewport', content: 'width=device-width, initial-scale=1' },
         { name: 'description', content: 'EzChat — a fast, modern realtime chat app for teams and friends.' },
         { name: 'theme-color', content: '#6366f1' },
+        { name: 'google-site-verification', content: 'rfAfah7CjJme68pjChHlTRbTYDJNOkHtWQjvkppSKrE' },
       ],
       link: [
         { rel: 'icon', type: 'image/svg+xml', href: '/chatfill.svg' },

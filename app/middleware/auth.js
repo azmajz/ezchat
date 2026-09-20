@@ -13,4 +13,12 @@ export default defineNuxtRouteMiddleware(async (to) => {
   if (!currentUser.value) {
     return navigateTo('/login')
   }
+
+  // Block email/password users who haven't verified their email yet
+  const user = currentUser.value
+  const isEmailProvider = user.providerData?.[0]?.providerId === 'password'
+  if (isEmailProvider && !user.emailVerified && to.path !== '/verify-email') {
+    return navigateTo('/verify-email')
+  }
 })
+
