@@ -101,7 +101,6 @@ const groupedMessages = computed(() => {
   const items = []
   let lastDate = null
   let lastSender = null
-  let lastTime = 0
 
   const clearedAt = props.chat?.clearedAt?.[currentUser.value?.uid]
   const clearTime = clearedAt ? (clearedAt.toDate ? clearedAt.toDate().getTime() : new Date(clearedAt).getTime()) : 0
@@ -114,20 +113,15 @@ const groupedMessages = computed(() => {
     const date = new Date(msgTime)
     const dateStr = date.toDateString()
 
-    // Break if day changed, OR if more than 30 minutes (1800000ms) has passed since last message
-    const timeDiff = msgTime - lastTime
-    const significantTimePassed = lastTime !== 0 && timeDiff > 1800000 // 30 mins
-
-    if (dateStr !== lastDate || significantTimePassed) {
-      const isSameDay = dateStr === lastDate;
-      items.push({ isDate: true, date: date.toISOString(), isSameDay, id: `date-${msg.id || msgTime}` })
+    // Only insert a separator when the calendar day changes
+    if (dateStr !== lastDate) {
+      items.push({ isDate: true, date: date.toISOString(), id: `date-${msg.id || msgTime}` })
       lastDate = dateStr
       lastSender = null
     }
 
-    const isFirstFromSender = msg.senderId !== lastSender || significantTimePassed
+    const isFirstFromSender = msg.senderId !== lastSender
     lastSender = msg.senderId
-    lastTime = msgTime
     items.push({ ...msg, isDate: false, isFirstFromSender })
   }
   return items

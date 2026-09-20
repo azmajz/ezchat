@@ -5,24 +5,29 @@
 </template>
 
 <script setup>
-const props = defineProps({ 
+const props = defineProps({
   date: { type: String, required: true },
-  sameDay: { type: Boolean, default: false }
 })
 
 const formattedDate = computed(() => {
   const d = new Date(props.date)
-  const today = new Date()
-  const yesterday = new Date(today)
-  yesterday.setDate(yesterday.getDate() - 1)
-  
-  const timeStr = d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+  const now = new Date()
 
-  if (props.sameDay) return timeStr
+  // Strip time for clean day comparisons
+  const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate())
+  const startOfMsg   = new Date(d.getFullYear(), d.getMonth(), d.getDate())
+  const diffDays = Math.round((startOfToday - startOfMsg) / 86400000)
 
-  if (d.toDateString() === today.toDateString()) return `Today ${timeStr}`
-  if (d.toDateString() === yesterday.toDateString()) return `Yesterday ${timeStr}`
-  return d.toLocaleDateString([], { month: 'short', day: 'numeric', year: 'numeric' }) + `, ${timeStr}`
+  if (diffDays === 0) return 'Today'
+  if (diffDays === 1) return 'Yesterday'
+
+  // Current week (Mon–Sun within last 7 days) → weekday name
+  if (diffDays < 7) {
+    return d.toLocaleDateString([], { weekday: 'long' }) // e.g. "Monday"
+  }
+
+  // Older → "20 Sep 2025"
+  return d.toLocaleDateString([], { day: 'numeric', month: 'short', year: 'numeric' })
 })
 </script>
 
@@ -41,7 +46,7 @@ const formattedDate = computed(() => {
   border: 1px solid var(--color-border);
   padding: 0.275rem 0.875rem;
   border-radius: var(--radius-full);
-  letter-spacing: 0.02em;
+  letter-spacing: 0.04em;
   text-transform: uppercase;
   box-shadow: var(--shadow-xs);
 }

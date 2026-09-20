@@ -82,7 +82,7 @@
         <div class="settings-card">
           <div class="setting-item">
             <div class="setting-info">
-              <span class="setting-title">Desktop Notifications</span>
+              <span class="setting-title">Notifications</span>
               <span class="setting-desc">Get notified when you receive new messages</span>
             </div>
             <label class="toggle-switch">
