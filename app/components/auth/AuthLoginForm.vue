@@ -78,10 +78,10 @@ async function handleEmailLogin() {
   loading.value = true
   try {
     await signInWithEmail(email.value, password.value)
-    router.push('/chat')
+    await router.push('/chat')
+    // keep loading=true — spinner stays visible during page transition
   } catch (e) {
     error.value = getFriendlyError(e.code)
-  } finally {
     loading.value = false
   }
 }
@@ -91,12 +91,12 @@ async function handleGoogle() {
   loading.value = true
   try {
     await signInWithGoogle()
-    router.push('/chat')
+    await router.push('/chat')
+    // keep loading=true — spinner stays visible during page transition
   } catch (e) {
     if (e.code !== 'auth/popup-closed-by-user') {
       error.value = getFriendlyError(e.code)
     }
-  } finally {
     loading.value = false
   }
 }
