@@ -1,10 +1,15 @@
 <template>
   <div class="settings-page">
     <header class="settings-header">
+      <!-- Mobile: back arrow -->
       <NuxtLink to="/chat" class="btn-icon back-btn" aria-label="Back to chat list">
         <Icon name="lucide:arrow-left" size="20" />
       </NuxtLink>
       <h2>Settings</h2>
+      <!-- Desktop: close button -->
+      <NuxtLink to="/chat" class="btn-icon close-btn" aria-label="Close settings">
+        <Icon name="lucide:x" size="20" />
+      </NuxtLink>
     </header>
 
     <div class="settings-content">
@@ -166,42 +171,54 @@ async function confirmLogout() {
   display: flex;
   flex-direction: column;
   height: 100%;
+  min-height: 0;
   overflow-y: auto;
   background: var(--color-surface-2);
+}
+
+@media (max-width: 767px) {
+  .settings-page {
+    height: 100dvh;
+  }
 }
 
 .settings-header {
   display: flex;
   align-items: center;
-  gap: 1rem;
-  padding: 1rem 1.5rem;
-  background: rgba(255, 255, 255, 0.8);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
+  gap: 0.75rem;
+  padding: 0 1rem;
+  height: var(--header-height);
+  background: var(--color-surface-2);
   border-bottom: 1px solid var(--color-border);
+  box-shadow: 0 1px 0 var(--color-border), 0 2px 8px rgba(60, 60, 120, 0.04);
   position: sticky;
   top: 0;
   z-index: 10;
-}
-
-html.dark .settings-header {
-  background: rgba(30, 41, 59, 0.8);
+  flex-shrink: 0;
 }
 
 .settings-header h2 {
-  font-size: var(--font-size-lg);
+  font-size: var(--font-size-base);
   font-weight: 700;
   margin: 0;
   color: var(--color-text);
+  flex: 1;
 }
 
+/* Mobile: show back arrow, hide close button */
 .back-btn {
   display: none;
   color: var(--color-text-secondary);
 }
+.close-btn {
+  display: inline-flex;
+  color: var(--color-text-secondary);
+  margin-left: auto;
+}
 
 @media (max-width: 767px) {
   .back-btn { display: inline-flex; }
+  .close-btn { display: none; }
 }
 
 .settings-content {

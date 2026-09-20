@@ -48,6 +48,10 @@
         <Icon :name="theme === 'dark' ? 'lucide:sun' : 'lucide:moon'" size="24" />
         <span>Theme</span>
       </button>
+      <NuxtLink to="/settings" class="nav-rail-item" :class="{ active: $route.path.startsWith('/settings') }" title="Settings">
+        <Icon name="lucide:settings" size="24" />
+        <span>Settings</span>
+      </NuxtLink>
     </div>
   </div>
 </template>

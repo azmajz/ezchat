@@ -2,14 +2,29 @@
   <div class="sidebar">
     <!-- Header -->
     <div class="sidebar-header">
+      <!-- Desktop: title -->
       <h2 class="sidebar-title">{{ sidebarTitle }}</h2>
-      
+
+      <!-- Mobile: current user profile -->
+      <NuxtLink to="/settings" class="sidebar-me" title="My profile">
+        <AppAvatar
+          :src="currentUser?.photoURL"
+          :name="currentUser?.displayName || 'Me'"
+          size="md"
+          :online="true"
+        />
+        <div class="sidebar-me-info">
+          <span class="sidebar-me-name">{{ currentUser?.displayName || 'Me' }}</span>
+          <span class="sidebar-me-status">Online</span>
+        </div>
+      </NuxtLink>
+
       <div class="sidebar-actions">
         <button class="btn-icon" @click="showGroupCreateModal = true" title="New group" id="btn-new-group">
-          <Icon name="lucide:users" size="18" />
+          <Icon name="lucide:user-plus" size="18" />
         </button>
-        <button class="btn-icon" @click="showSearchModal = true" title="New chat" id="btn-new-chat">
-          <Icon name="lucide:message-square-plus" size="18" />
+        <button class="btn-icon" @click="showSearchModal = true" title="Find people" id="btn-new-chat">
+          <Icon name="lucide:user-search" size="18" />
         </button>
       </div>
     </div>
@@ -59,6 +74,21 @@
       </template>
     </div>
 
+    <!-- Mobile-only bottom bar -->
+    <div class="sidebar-mobile-bar">
+      <button class="mobile-bar-btn" :class="{ active: activeTab === 'chat' }" @click="setTab('chat')">
+        <Icon name="lucide:message-square" size="20" />
+        <span>Chats</span>
+      </button>
+      <button class="mobile-bar-btn" :class="{ active: activeTab === 'groups' }" @click="setTab('groups')">
+        <Icon name="lucide:users" size="20" />
+        <span>Groups</span>
+      </button>
+      <NuxtLink to="/settings" class="mobile-bar-btn">
+        <Icon name="lucide:settings" size="20" />
+        <span>Settings</span>
+      </NuxtLink>
+    </div>
   </div>
 
   <!-- Modals live here — Teleported to body, always above everything -->
@@ -74,9 +104,11 @@ const { chats, chatsLoading } = useChats()
 const { currentUser } = useAuth()
 const { showSearchModal, showGroupCreateModal } = useUI()
 
-const searchQuery = ref('')
+const activeTab = computed(() => route.query.filter === 'groups' ? 'groups' : 'chat')
 const activeChat = computed(() => route.params.chatId)
 const sidebarTitle = computed(() => route.query.filter === 'groups' ? 'Groups' : 'Chat')
+
+const searchQuery = ref('')
 
 const filteredChats = computed(() => {
   let list = chats.value
@@ -99,8 +131,16 @@ const filteredChats = computed(() => {
   return list
 })
 
+
 function openChat(chatId) {
   router.push(`/chat/${chatId}`)
+}
+
+function setTab(tab) {
+  const query = { ...route.query }
+  if (tab === 'groups') query.filter = 'groups'
+  else delete query.filter
+  router.push({ query })
 }
 </script>
 
@@ -117,25 +157,92 @@ function openChat(chatId) {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 1rem 1rem 0.75rem;
+  padding: 1.125rem 1rem 0.75rem;
   flex-shrink: 0;
+  gap: 0.5rem;
+}
+@media (max-width: 767px) {
+  .sidebar-header {
+    padding: 1rem 1rem 0.75rem;
+  }
 }
 
+/* Desktop title — hidden on mobile */
 .sidebar-title {
   font-size: var(--font-size-2xl);
   font-weight: 700;
   color: var(--color-text);
+  flex: 1;
+  min-width: 0;
+}
+@media (max-width: 767px) {
+  .sidebar-title { display: none; }
+}
+
+/* Skype-style current user — mobile only */
+.sidebar-me {
+  display: none;
+  align-items: center;
+  gap: 0.75rem;
+  text-decoration: none;
+  border-radius: var(--radius-md);
+  padding: 0.3rem 0.5rem;
+  margin: -0.3rem -0.5rem;
+  flex: 1;
+  min-width: 0;
+  transition: background var(--transition-fast);
+}
+@media (max-width: 767px) {
+  .sidebar-me { display: flex; }
+}
+.sidebar-me:hover {
+  background: var(--color-surface-3);
+}
+.sidebar-me-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+  min-width: 0;
+}
+.sidebar-me-name {
+  font-size: 0.9375rem;
+  font-weight: 700;
+  color: var(--color-text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  line-height: 1.2;
+}
+.sidebar-me-status {
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--color-online);
+  line-height: 1;
+}
+
+/* Hide on mobile — bottom tab bar handles this */
+.btn-desktop-only {
+  display: inline-flex;
+}
+@media (max-width: 767px) {
+  .btn-desktop-only { display: none; }
 }
 
 .sidebar-actions {
   display: flex;
   align-items: center;
   gap: 0.125rem;
+  flex-shrink: 0;
 }
 
 .sidebar-search {
-  padding: 0 0.75rem 0.75rem;
+  padding: 0.25rem 0.75rem 0.75rem;
   flex-shrink: 0;
+}
+@media (max-width: 767px) {
+  .sidebar-search {
+    padding: 0.5rem 0.875rem 0.875rem;
+  }
 }
 
 .search-wrap { position: relative; }
@@ -171,7 +278,63 @@ function openChat(chatId) {
 .sidebar-list {
   flex: 1;
   overflow-y: auto;
-  padding: 0 0.5rem;
+  padding: 0.5rem 0.5rem;
+}
+
+/* ── Mobile bottom bar ── */
+.sidebar-mobile-bar {
+  display: none;
+}
+@media (max-width: 767px) {
+  .sidebar-mobile-bar {
+    display: flex;
+    align-items: stretch;
+    border-top: 1px solid var(--color-border);
+    background: var(--color-sidebar);
+    padding-bottom: env(safe-area-inset-bottom);
+    flex-shrink: 0;
+  }
+  .mobile-bar-btn {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.25rem;
+    background: none;
+    border: none;
+    color: var(--color-text-muted);
+    font-family: inherit;
+    font-size: 10px;
+    font-weight: 500;
+    cursor: pointer;
+    padding: 0.6rem 0.5rem;
+    text-decoration: none;
+    transition: color 0.15s;
+    position: relative;
+  }
+  .mobile-bar-btn::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 20%;
+    right: 20%;
+    height: 2px;
+    border-radius: 0 0 2px 2px;
+    background: var(--color-primary);
+    opacity: 0;
+    transition: opacity 0.15s;
+  }
+  .mobile-bar-btn.active {
+    color: var(--color-primary);
+    font-weight: 600;
+  }
+  .mobile-bar-btn.active::before {
+    opacity: 1;
+  }
+  .mobile-bar-btn:hover {
+    color: var(--color-primary);
+  }
 }
 
 .sidebar-empty {
