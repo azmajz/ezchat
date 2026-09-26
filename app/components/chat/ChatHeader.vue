@@ -10,8 +10,10 @@
       <AppAvatar
         :src="avatarSrc"
         :name="displayName"
+        :id="chat?.id"
         :online="chat?.type === 'direct' ? otherUserOnline : undefined"
         size="sm"
+        :fallbackIcon="chat?.type === 'group' ? 'lucide:users' : 'lucide:user'"
       />
       <div class="header-meta">
         <span class="header-name">{{ displayName }}</span>
@@ -104,6 +106,21 @@ function loadOtherUser() {
   if (!props.chat || props.chat.type !== 'direct') return
   const otherUid = props.chat.participants?.find((p) => p !== currentUser.value?.uid)
   if (!otherUid) return
+
+  if (otherUid === 'bot_echo') {
+    otherUserData.value = {
+      uid: 'bot_echo',
+      displayName: 'EzChat Bot',
+      email: 'bot@ezchat.app',
+      photoURL: null,
+      isOnline: true,
+      status: 'online',
+      provider: 'System',
+      bio: 'I am the EzChat AI assistant. I echo your messages and help you test things out!'
+    }
+    return
+  }
+
   const db = getFirestore()
   unsubUser = onSnapshot(doc(db, 'users', otherUid), (snap) => {
     if (snap.exists()) otherUserData.value = snap.data()

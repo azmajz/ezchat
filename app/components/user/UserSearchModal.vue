@@ -31,7 +31,7 @@
           @click="startChat(user)"
           :disabled="startingChat"
         >
-          <AppAvatar :src="user.photoURL" :name="user.displayName" size="sm" :online="user.isOnline" />
+          <AppAvatar :src="user.photoURL" :name="user.displayName" size="sm" :online="user.isOnline" fallbackIcon="lucide:user" />
           <div class="user-result-info">
             <span class="user-result-name">{{ user.displayName }}</span>
             <span class="user-result-email">{{ user.email }}</span>

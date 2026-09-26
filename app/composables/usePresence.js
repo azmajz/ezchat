@@ -17,6 +17,12 @@ export function usePresence() {
   async function setOnlineStatus(isOnline) {
     const uid = currentUser.value?.uid
     if (!uid) return
+    
+    // If the user has explicitly set their status to offline, do not automatically mark them as online
+    if (isOnline && currentUser.value?.status === 'offline') {
+      return
+    }
+
     try {
       const userRef = doc(db, 'users', uid)
       await updateDoc(userRef, {

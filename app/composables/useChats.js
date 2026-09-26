@@ -91,7 +91,7 @@ export function useChats() {
     return ref.id
   }
 
-  async function createGroupChat(name, photoURL, memberIds) {
+  async function createGroupChat(name, description, photoURL, memberIds) {
     const db = getDb()
     const uid = auth.currentUser?.uid
     if (!uid) return null
@@ -100,6 +100,7 @@ export function useChats() {
     const ref = await addDoc(collection(db, 'chats'), {
       type: 'group',
       name,
+      description: description || null,
       photoURL: photoURL || null,
       participants: allParticipants,
       admins: [uid],
@@ -147,19 +148,25 @@ export function useChats() {
     return snap.exists() ? { id: snap.id, ...snap.data() } : null
   }
 
+  let cachedUsers = null
+  
   async function searchUsers(searchTerm) {
     const db = getDb()
     const uid = auth.currentUser?.uid
-    const snap = await getDocs(collection(db, 'users'))
+    
+    if (!cachedUsers) {
+      const snap = await getDocs(collection(db, 'users'))
+      cachedUsers = snap.docs.map((d) => ({ id: d.id, ...d.data() }))
+    }
+    
     const term = searchTerm.toLowerCase()
-    return snap.docs
-      .map((d) => ({ id: d.id, ...d.data() }))
-      .filter(
-        (u) =>
-          u.uid !== uid &&
-          (u.displayName?.toLowerCase().includes(term) ||
-            u.email?.toLowerCase().includes(term))
-      )
+    return cachedUsers.filter(
+      (u) =>
+        u.uid !== uid &&
+        u.uid !== 'bot_echo' &&
+        (u.displayName?.toLowerCase().includes(term) ||
+          u.email?.toLowerCase().includes(term))
+    )
   }
 
 

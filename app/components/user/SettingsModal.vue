@@ -9,24 +9,50 @@
     <div class="settings-content">
       
       <!-- Profile Card (Link to Profile Modal) -->
-      <button class="profile-card" @click="$emit('openProfile')">
-        <AppAvatar :src="currentUser?.photoURL" :name="currentUser?.displayName" size="lg" />
+      <button class="profile-link-card" @click="$emit('openProfile')">
+        <AppAvatar :src="currentUser?.photoURL" :name="currentUser?.displayName" size="lg" class="profile-avatar" fallbackIcon="lucide:user" />
         <div class="profile-info">
-          <h3>{{ currentUser?.displayName || 'User' }}</h3>
+          <h3>{{ currentUser?.displayName || 'Your Name' }}</h3>
           <p>{{ currentUser?.email }}</p>
+          <span class="edit-text">Edit Profile</span>
         </div>
         <div class="profile-action">
-          <Icon name="lucide:chevron-right" size="20" />
+          <Icon name="lucide:chevron-right" size="24" />
         </div>
       </button>
 
-      <div class="settings-group">
+      <!-- Status Section -->
+      <section v-if="false" class="settings-section">
+        <div class="section-header">
+          <h3 class="group-title">Your Status</h3>
+        </div>
+        <div class="status-grid">
+          <button 
+            v-for="opt in statusOptions" 
+            :key="opt.value"
+            class="status-option"
+            :class="{ active: currentStatus === opt.value }"
+            @click="setStatus(opt.value)"
+          >
+            <AppStatusIndicator :status="opt.value" size="md" />
+            <div class="status-info">
+              <span class="status-label">{{ opt.label }}</span>
+            </div>
+            <div class="status-check" v-if="currentStatus === opt.value">
+              <Icon name="lucide:check" size="16" class="text-primary" />
+            </div>
+          </button>
+        </div>
+      </section>
+
+      <!-- Preferences Section -->
+      <section class="settings-section">
         <h3 class="group-title">Preferences</h3>
         <div class="settings-list">
           
           <div class="list-item">
             <div class="item-icon-wrap theme-icon">
-              <Icon name="lucide:palette" size="18" />
+              <Icon :name="theme === 'dark' ? 'lucide:moon' : 'lucide:sun'" size="18" />
             </div>
             <div class="item-content">
               <span class="item-title">Dark Mode</span>
@@ -62,9 +88,10 @@
         <div v-if="permission === 'denied'" class="form-error mt-2 ml-2">
           Notification permissions are denied by your browser.
         </div>
-      </div>
+      </section>
 
-      <div class="settings-group">
+      <!-- More Section -->
+      <section class="settings-section">
         <h3 class="group-title">More</h3>
         <div class="settings-list">
           <NuxtLink to="/privacy-policy" class="list-item clickable" @click="$emit('update:modelValue', false)">
@@ -75,14 +102,12 @@
               <span class="item-title">Privacy Policy</span>
             </div>
             <div class="item-action">
-              <Icon name="lucide:chevron-right" size="18" class="text-muted" />
+              <Icon name="lucide:chevron-right" size="20" class="text-muted" />
             </div>
           </NuxtLink>
-        </div>
-      </div>
+          
+          <div class="list-divider"></div>
 
-      <div class="settings-group">
-        <div class="settings-list">
           <button class="list-item clickable text-danger w-full" @click="confirmLogout">
             <div class="item-icon-wrap logout-icon">
               <Icon name="lucide:log-out" size="18" />
@@ -92,7 +117,7 @@
             </div>
           </button>
         </div>
-      </div>
+      </section>
 
       <div class="app-version">
         EzChat v1.0.0
@@ -108,10 +133,37 @@ const props = defineProps({
 })
 const emit = defineEmits(['update:modelValue', 'openProfile'])
 
-const { currentUser, logout } = useAuth()
+const { currentUser, currentUserDoc, logout, updateStatus } = useAuth()
 const router = useRouter()
 const { theme, toggleTheme } = useTheme()
 const { enabled: notificationsEnabled, permission, toggleNotifications } = useNotifications()
+const { showToast } = useUI()
+
+const statusOptions = [
+  { value: 'online', label: 'Online' },
+  { value: 'away', label: 'Away' },
+  { value: 'busy', label: 'Busy' },
+  { value: 'offline', label: 'Offline' },
+]
+
+const currentStatus = ref('online')
+
+watch(() => currentUserDoc.value, (docData) => {
+  if (docData) {
+    currentStatus.value = docData.status || 'online'
+  }
+}, { immediate: true })
+
+async function setStatus(val) {
+  try {
+    currentStatus.value = val
+    await updateStatus(val)
+    showToast('Status updated', 'success')
+  } catch (err) {
+    currentStatus.value = currentUserDoc.value?.status || 'online'
+    showToast('Failed to update status', 'error')
+  }
+}
 
 async function confirmLogout() {
   emit('update:modelValue', false)
@@ -125,34 +177,40 @@ async function confirmLogout() {
   display: flex;
   flex-direction: column;
   gap: 1.5rem;
+  padding-bottom: 1rem;
 }
 
-/* Profile Card */
-.profile-card {
+.profile-link-card {
   display: flex;
   align-items: center;
-  background: var(--color-surface);
+  background: var(--color-navrail);
   border: 1px solid var(--color-border);
   border-radius: var(--radius-xl, 1rem);
   padding: 1.25rem;
   gap: 1rem;
   box-shadow: var(--shadow-sm);
   text-decoration: none;
-  transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+  transition: background 0.2s ease;
   width: 100%;
   cursor: pointer;
   text-align: left;
 }
-.profile-card:hover {
-  transform: translateY(-2px);
-  box-shadow: var(--shadow-md);
-  background: var(--color-surface-hover, var(--color-surface));
+
+.profile-link-card:hover {
+  background: var(--color-surface-3, var(--color-border-light));
+}
+
+.profile-avatar {
+  border: none;
 }
 
 .profile-info {
   flex: 1;
   min-width: 0;
+  display: flex;
+  flex-direction: column;
 }
+
 .profile-info h3 {
   margin: 0 0 0.25rem 0;
   font-size: 1.15rem;
@@ -162,13 +220,22 @@ async function confirmLogout() {
   overflow: hidden;
   text-overflow: ellipsis;
 }
+
 .profile-info p {
   margin: 0;
   font-size: 0.9rem;
   color: var(--color-text-muted);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  word-break: break-all;
+  white-space: normal;
+}
+
+.edit-text {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--color-primary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-top: 0.25rem;
 }
 
 .profile-action {
@@ -177,8 +244,8 @@ async function confirmLogout() {
   align-items: center;
 }
 
-/* Settings Groups */
-.settings-group {
+/* Settings Sections */
+.settings-section {
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
@@ -195,7 +262,7 @@ async function confirmLogout() {
 }
 
 .settings-list {
-  background: var(--color-surface);
+  background: var(--color-navrail);
   border: 1px solid var(--color-border);
   border-radius: var(--radius-xl, 1rem);
   overflow: hidden;
@@ -205,7 +272,7 @@ async function confirmLogout() {
 .list-item {
   display: flex;
   align-items: center;
-  padding: 1rem 1.25rem;
+  padding: 0.85rem 1.25rem;
   gap: 1rem;
   background: transparent;
   border: none;
@@ -214,10 +281,12 @@ async function confirmLogout() {
   color: inherit;
   transition: background 0.2s ease;
 }
+
 .list-item.clickable {
   cursor: pointer;
   width: 100%;
 }
+
 .list-item.clickable:hover {
   background: var(--color-surface-hover, var(--color-surface-2));
 }
@@ -228,6 +297,7 @@ async function confirmLogout() {
   margin-left: 3.5rem;
 }
 
+/* Colored Icons */
 .item-icon-wrap {
   width: 36px;
   height: 36px;
@@ -235,13 +305,24 @@ async function confirmLogout() {
   display: flex;
   align-items: center;
   justify-content: center;
-  color: white;
   flex-shrink: 0;
 }
-.theme-icon { background: #8b5cf6; }
-.notif-icon { background: #ef4444; }
-.privacy-icon { background: #3b82f6; }
-.logout-icon { background: rgba(239, 68, 68, 0.1); color: #ef4444; }
+.theme-icon { 
+  background: rgba(139, 92, 246, 0.15); 
+  color: #8b5cf6; 
+}
+.notif-icon { 
+  background: rgba(239, 68, 68, 0.15); 
+  color: #ef4444; 
+}
+.privacy-icon { 
+  background: rgba(59, 130, 246, 0.15); 
+  color: #3b82f6; 
+}
+.logout-icon { 
+  background: rgba(239, 68, 68, 0.15); 
+  color: #ef4444; 
+}
 
 .item-content {
   flex: 1;
@@ -263,31 +344,57 @@ async function confirmLogout() {
   color: #ef4444 !important;
 }
 
-.item-action {
+/* Status Grid */
+.status-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.5rem;
+}
+
+.status-option {
   display: flex;
   align-items: center;
-}
-.text-muted {
-  color: var(--color-text-muted);
+  gap: 0.75rem;
+  padding: 0.75rem 1rem;
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--color-border);
+  background: var(--color-navrail);
+  cursor: pointer;
+  text-align: left;
+  transition: background 0.2s ease;
 }
 
-.w-full {
-  width: 100%;
+.status-option:hover {
+  background: var(--color-surface-3, var(--color-border-light));
 }
 
-.app-version {
-  text-align: center;
+.status-option.active {
+  border-color: var(--color-primary);
+  background: rgba(var(--color-primary-rgb), 0.05);
+}
+
+.status-info {
+  flex: 1;
+}
+
+.status-label {
+  font-weight: 600;
   font-size: 0.85rem;
-  color: var(--color-text-muted);
-  margin-top: 0.5rem;
+  color: var(--color-text);
 }
 
-/* Toggle Switch Styles */
+.status-check {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Toggles */
 .toggle-switch {
   position: relative;
   display: inline-block;
-  width: 46px;
-  height: 26px;
+  width: 44px;
+  height: 24px;
   flex-shrink: 0;
 }
 
@@ -303,14 +410,14 @@ async function confirmLogout() {
   top: 0; left: 0; right: 0; bottom: 0;
   background-color: var(--color-border);
   transition: .3s;
-  border-radius: 26px;
+  border-radius: 24px;
 }
 
 .slider:before {
   position: absolute;
   content: "";
-  height: 20px;
-  width: 20px;
+  height: 18px;
+  width: 18px;
   left: 3px;
   bottom: 3px;
   background-color: white;
@@ -327,6 +434,18 @@ input:checked + .slider:before {
   transform: translateX(20px);
 }
 
+.w-full { width: 100%; }
 .mt-2 { margin-top: 0.5rem; }
 .ml-2 { margin-left: 0.5rem; }
+.form-error {
+  color: #ef4444;
+  font-size: 0.8rem;
+}
+
+.app-version {
+  text-align: center;
+  font-size: 0.85rem;
+  color: var(--color-text-muted);
+  margin-top: 0.5rem;
+}
 </style>

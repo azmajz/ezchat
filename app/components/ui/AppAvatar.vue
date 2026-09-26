@@ -1,7 +1,10 @@
 <template>
   <div class="avatar" :class="[`avatar-${size}`]">
     <img v-if="effectiveSrc" :src="effectiveSrc" :alt="name" class="avatar-img" @error="imgError = true" />
-    <span v-else class="avatar-initials" :style="avatarStyle">{{ initials }}</span>
+    <span v-else class="avatar-initials" :style="avatarStyle">
+      <Icon v-if="fallbackIcon" :name="fallbackIcon" class="fallback-icon" />
+      <template v-else>{{ initials }}</template>
+    </span>
     <span v-if="online !== undefined" class="avatar-status" :class="online ? 'online' : 'offline'"></span>
   </div>
 </template>
@@ -10,8 +13,10 @@
 const props = defineProps({
   src: { type: String, default: null },
   name: { type: String, default: '' },
+  id: { type: String, default: '' },
   size: { type: String, default: 'md' }, // xs, sm, md, lg, xl
   online: { type: Boolean, default: undefined },
+  fallbackIcon: { type: String, default: null },
 })
 
 const imgError = ref(false)
@@ -30,10 +35,10 @@ const avatarColors = [
 ]
 
 const avatarStyle = computed(() => {
-  const nameStr = props.name || '?'
+  const hashStr = props.id || props.name || '?'
   let hash = 0
-  for (let i = 0; i < nameStr.length; i++) {
-    hash = nameStr.charCodeAt(i) + ((hash << 5) - hash)
+  for (let i = 0; i < hashStr.length; i++) {
+    hash = hashStr.charCodeAt(i) + ((hash << 5) - hash)
   }
   const index = Math.abs(hash) % avatarColors.length
   return {
@@ -55,6 +60,7 @@ const avatarStyle = computed(() => {
 .avatar-md { width: 44px; height: 44px; font-size: 16px; }
 .avatar-lg { width: 56px; height: 56px; font-size: 20px; }
 .avatar-xl { width: 80px; height: 80px; font-size: 28px; }
+.avatar-2xl { width: 112px; height: 112px; font-size: 36px; }
 
 .avatar-img {
   width: 100%; height: 100%;
@@ -69,6 +75,10 @@ const avatarStyle = computed(() => {
   align-items: center;
   justify-content: center;
   font-weight: 600;
+}
+.fallback-icon {
+  width: 50%;
+  height: 50%;
 }
 .avatar-status {
   position: absolute;

@@ -8,8 +8,10 @@
       <AppAvatar
         :src="chat.photoURL || otherUserPhoto"
         :name="displayName"
+        :id="chat.id"
         :online="chat.type === 'direct' ? otherUserOnline : undefined"
         size="md"
+        :fallbackIcon="chat.type === 'group' ? 'lucide:users' : 'lucide:user'"
       />
     </div>
 

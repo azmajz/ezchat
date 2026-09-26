@@ -23,6 +23,12 @@
         <input id="group-name" v-model="groupName" type="text" class="form-input" placeholder="e.g. Team Rocket" required />
       </div>
 
+      <!-- Group description -->
+      <div class="form-group">
+        <label class="form-label" for="group-description">Description</label>
+        <textarea id="group-description" v-model="groupDescription" class="form-input" rows="2" placeholder="What is this group about?"></textarea>
+      </div>
+
       <!-- Add members -->
       <div class="form-group">
         <label class="form-label" for="group-member-search">Add Members</label>
@@ -35,7 +41,7 @@
       <!-- Search results -->
       <div v-if="searchResults.length" class="member-results">
         <button v-for="user in searchResults" :key="user.uid" class="member-result" @click="addMember(user)">
-          <AppAvatar :src="user.photoURL" :name="user.displayName" size="xs" />
+          <AppAvatar :src="user.photoURL" :name="user.displayName" size="xs" fallbackIcon="lucide:user" />
           <span>{{ user.displayName }}</span>
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
         </button>
@@ -44,7 +50,7 @@
       <!-- Selected members -->
       <div v-if="selectedMembers.length" class="selected-members">
         <div v-for="user in selectedMembers" :key="user.uid" class="selected-chip">
-          <AppAvatar :src="user.photoURL" :name="user.displayName" size="xs" />
+          <AppAvatar :src="user.photoURL" :name="user.displayName" size="xs" fallbackIcon="lucide:user" />
           <span>{{ user.displayName }}</span>
           <button class="chip-remove" @click="removeMember(user.uid)">
             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
@@ -75,6 +81,7 @@ const { uploadGroupImage } = useStorage()
 const { showToast } = useUI()
 
 const groupName = ref('')
+const groupDescription = ref('')
 const groupImage = ref(null)
 const groupImagePreview = ref(null)
 const memberSearch = ref('')
@@ -119,7 +126,7 @@ async function createGroup() {
   creating.value = true
   try {
     let photoURL = null
-    const chatId = await createGroupChat(groupName.value.trim(), null, selectedMembers.value.map((m) => m.uid))
+    const chatId = await createGroupChat(groupName.value.trim(), groupDescription.value.trim(), null, selectedMembers.value.map((m) => m.uid))
     if (groupImage.value && chatId) {
       photoURL = await uploadGroupImage(chatId, groupImage.value)
       const { updateGroupChat } = useChats()
@@ -128,6 +135,7 @@ async function createGroup() {
     showToast('Group created!', 'success')
     emit('update:modelValue', false)
     groupName.value = ''
+    groupDescription.value = ''
     selectedMembers.value = []
     groupImage.value = null
     groupImagePreview.value = null

@@ -4,7 +4,7 @@
     <div class="nav-rail-top">
       <div class="dropdown-container">
         <button class="nav-rail-profile" @click="showProfileMenu = !showProfileMenu" aria-label="Profile options">
-          <AppAvatar :src="currentUser?.photoURL" :name="currentUser?.displayName || 'Me'" size="sm" :online="true" />
+          <AppAvatar :src="currentUser?.photoURL" :name="currentUser?.displayName || 'Me'" size="sm" :online="true" fallbackIcon="lucide:user" />
         </button>
         
         <div v-if="showProfileMenu" class="dropdown-overlay" @click="showProfileMenu = false"></div>

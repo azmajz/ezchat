@@ -1,8 +1,11 @@
 <template>
   <div class="member-row-inner">
-    <AppAvatar :src="userData?.photoURL" :name="userData?.displayName || '...'" size="sm" :online="userData?.isOnline" />
+    <AppAvatar :src="userData?.photoURL" :name="userData?.displayName || '...'" size="sm" :online="userData?.isOnline" fallbackIcon="lucide:user" />
     <div class="member-info">
-      <div class="member-name">{{ userData?.displayName || '...' }}</div>
+      <div class="member-name">
+        {{ userData?.displayName || '...' }}
+        <span v-if="uid === currentUser?.uid" class="text-muted font-normal">(You)</span>
+      </div>
       <div v-if="isAdmin" class="member-role">Admin</div>
     </div>
     <button v-if="canRemove" @click="$emit('remove')" class="btn-icon remove-btn" title="Remove member">
@@ -21,6 +24,7 @@ const props = defineProps({
 })
 defineEmits(['remove'])
 
+const { currentUser } = useAuth()
 const userData = ref(null)
 
 onMounted(async () => {

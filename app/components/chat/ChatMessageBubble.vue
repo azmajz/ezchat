@@ -3,7 +3,7 @@
     
     <!-- Avatar (only for received messages) -->
     <div v-if="!isOwn" class="message-avatar">
-      <AppAvatar v-if="isFirstFromSender" :src="senderData?.photoURL" :name="senderData?.displayName || '...'" size="sm" />
+      <AppAvatar v-if="isFirstFromSender" :src="senderData?.photoURL" :name="senderData?.displayName || '...'" size="sm" fallbackIcon="lucide:user" />
     </div>
 
     <div class="message-content">

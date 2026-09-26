@@ -34,6 +34,33 @@
           />
         </div>
       </div>
+
+      <div class="form-group">
+        <label class="form-label" for="profile-bio">Bio</label>
+        <div class="input-wrapper">
+          <Icon name="lucide:align-left" size="18" class="input-icon top-icon" />
+          <textarea
+            id="profile-bio"
+            v-model="bio"
+            class="form-input with-icon form-textarea"
+            placeholder="A little about yourself..."
+          ></textarea>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="profile-link">Website / Link</label>
+        <div class="input-wrapper">
+          <Icon name="lucide:link" size="18" class="input-icon" />
+          <input
+            id="profile-link"
+            v-model="link"
+            type="url"
+            class="form-input with-icon"
+            placeholder="https://yourwebsite.com"
+          />
+        </div>
+      </div>
       
       <div class="form-group">
         <label class="form-label">Email Address</label>
@@ -64,15 +91,24 @@ const props = defineProps({
 })
 const emit = defineEmits(['update:modelValue'])
 
-const { currentUser, updateUserProfile } = useAuth()
+const { currentUser, currentUserDoc, updateUserProfile } = useAuth()
 const { uploadAvatar } = useStorage()
 const { showToast } = useUI()
 
 const displayName = ref(currentUser.value?.displayName || '')
+const bio = ref('')
+const link = ref('')
 const previewUrl = ref(null)
 const avatarFile = ref(null)
 const saving = ref(false)
 const error = ref('')
+
+watch(() => currentUserDoc.value, (docData) => {
+  if (docData && !saving.value) {
+    bio.value = docData.bio || ''
+    link.value = docData.link || ''
+  }
+}, { immediate: true })
 
 watch(() => currentUser.value, (u) => {
   if (u && !saving.value) displayName.value = u.displayName || ''
@@ -94,7 +130,12 @@ async function saveProfile() {
     if (avatarFile.value) {
       photoURL = await uploadAvatar(currentUser.value.uid, avatarFile.value)
     }
-    await updateUserProfile({ displayName: displayName.value.trim(), photoURL })
+    await updateUserProfile({ 
+      displayName: displayName.value.trim(), 
+      photoURL,
+      bio: bio.value.trim(),
+      link: link.value.trim()
+    })
     showToast('Profile updated successfully!', 'success')
     previewUrl.value = null
     avatarFile.value = null
@@ -120,6 +161,7 @@ async function saveProfile() {
   flex-direction: column;
   align-items: center;
   text-align: center;
+  margin-bottom: 0.5rem;
 }
 
 .avatar-upload-wrap {
@@ -171,7 +213,7 @@ async function saveProfile() {
 }
 
 .form-label {
-  font-size: 0.9rem;
+  font-size: 0.85rem;
   font-weight: 600;
   color: var(--color-text-secondary);
   margin-left: 0.25rem;
@@ -188,14 +230,42 @@ async function saveProfile() {
   left: 1rem;
   color: var(--color-text-muted);
 }
+.top-icon {
+  top: 1rem;
+}
+
+.form-input {
+  width: 100%;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--color-border);
+  background: var(--color-navrail);
+  color: var(--color-text);
+  font-size: 0.95rem;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.form-input:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 2px rgba(var(--color-primary-rgb), 0.2);
+}
 
 .form-input.with-icon {
   padding-left: 2.75rem;
   height: 3rem;
 }
 
-.disabled-wrapper {
-  opacity: 0.7;
+.form-textarea {
+  height: auto;
+  min-height: 5.5rem;
+  padding-top: 1rem;
+  padding-bottom: 1rem;
+  resize: vertical;
+}
+
+.disabled-wrapper .form-input {
+  opacity: 0.5;
+  background: var(--color-navrail);
 }
 
 .input-hint {
@@ -206,7 +276,7 @@ async function saveProfile() {
 }
 
 .settings-actions {
-  margin-top: 0.5rem;
+  margin-top: 1rem;
 }
 
 .btn-lg {
@@ -221,5 +291,14 @@ async function saveProfile() {
   display: flex;
   justify-content: center;
   align-items: center;
+}
+
+.form-error {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: #ef4444;
+  font-size: 0.85rem;
+  margin-top: 0.5rem;
 }
 </style>

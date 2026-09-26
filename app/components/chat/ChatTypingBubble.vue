@@ -1,7 +1,7 @@
 <template>
   <div class="message-wrap">
     <div class="message-avatar">
-      <AppAvatar :src="senderData?.photoURL" :name="senderData?.displayName || '...'" size="sm" />
+      <AppAvatar :src="senderData?.photoURL" :name="senderData?.displayName || '...'" size="sm" fallbackIcon="lucide:user" />
     </div>
     <div class="message-content">
       <span v-if="isGroup" class="sender-name">{{ senderData?.displayName || 'Unknown' }}</span>
