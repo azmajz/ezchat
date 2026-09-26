@@ -4,10 +4,10 @@
       <AppLoader size="md" />
     </div>
 
-    <div v-else-if="messages.length === 0" class="messages-empty">
+    <div v-else-if="groupedMessages.length === 0" class="messages-empty">
       <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" opacity="0.2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
       <p>No messages yet</p>
-      <span>Say hello! 👋</span>
+      <button class="hello-btn" @click="$emit('quick-reply', 'Hello! 👋')">Say - Hello! 👋</button>
     </div>
 
     <div v-else class="messages-list">
@@ -202,8 +202,29 @@ onMounted(() => {
   color: var(--color-text-secondary);
 }
 
-.messages-empty span {
-  font-size: var(--font-size-md);
+.hello-btn {
+  background: var(--color-surface);
+  border: 1px solid var(--color-primary);
+  color: var(--color-primary);
+  border-radius: var(--radius-full);
+  padding: 0.4rem 0.8rem;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: var(--shadow-sm);
+  margin-top: 0.5rem;
+}
+
+.hello-btn:hover {
+  background: var(--color-primary);
+  color: #fff;
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-md);
+}
+
+.hello-btn:active {
+  transform: translateY(0);
 }
 
 .messages-list {

@@ -9,7 +9,7 @@
     "preview": "nuxt preview",
     "postinstall": "nuxt prepare",
     "deploy": "firebase deploy --only hosting:ezct",
-    "publish": "npm run dev & npm run deploy"
+    "publish": "npm run generate & npm run deploy"
   },
   "dependencies": {
     "firebase": "^12.19.0",

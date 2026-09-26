@@ -20,14 +20,19 @@
       </div>
       <div class="item-row-bottom">
         <span class="item-preview">
-          <span v-if="chat.lastMessageSenderId === currentUser?.uid" style="font-weight: 500;">You: </span>
-          <span v-else-if="chat.type === 'group' && lastSenderName" style="font-weight: 500;">{{ lastSenderName }}: </span>
-          <template v-if="chat.lastMessage?.startsWith('📎 ')">
-            <Icon name="lucide:paperclip" size="13" style="vertical-align: -2px; margin-right: 2px;" />
-            {{ chat.lastMessage.substring(2) }}
+          <template v-if="isClearedForMe">
+            No messages yet
           </template>
           <template v-else>
-            {{ chat.lastMessage || 'No messages yet' }}
+            <span v-if="chat.lastMessageSenderId === currentUser?.uid" style="font-weight: 500;">You: </span>
+            <span v-else-if="chat.type === 'group' && lastSenderName" style="font-weight: 500;">{{ lastSenderName }}: </span>
+            <template v-if="chat.lastMessage?.startsWith('📎 ')">
+              <Icon name="lucide:paperclip" size="13" style="vertical-align: -2px; margin-right: 2px;" />
+              {{ chat.lastMessage.substring(2) }}
+            </template>
+            <template v-else>
+              {{ chat.lastMessage || 'No messages yet' }}
+            </template>
           </template>
         </span>
         <span v-if="unreadCount > 0" class="badge">{{ unreadCount > 99 ? '99+' : unreadCount }}</span>
@@ -60,7 +65,20 @@ const displayName = computed(() => {
 const otherUserPhoto = computed(() => otherUserData.value?.photoURL || null)
 const otherUserOnline = computed(() => otherUserData.value?.isOnline || false)
 
+const isClearedForMe = computed(() => {
+  if (!currentUser.value?.uid) return false
+  const clearedAt = props.chat.clearedAt?.[currentUser.value.uid]
+  const lastMsgAt = props.chat.lastMessageAt
+  if (!clearedAt || !lastMsgAt) return false
+  
+  const clearedMs = clearedAt.toDate ? clearedAt.toDate().getTime() : new Date(clearedAt).getTime()
+  const lastMs = lastMsgAt.toDate ? lastMsgAt.toDate().getTime() : new Date(lastMsgAt).getTime()
+  
+  return clearedMs >= lastMs
+})
+
 const lastMessageTime = computed(() => {
+  if (isClearedForMe.value) return ''
   const ts = props.chat.lastMessageAt
   if (!ts) return ''
   const date = ts.toDate ? ts.toDate() : new Date(ts)

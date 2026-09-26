@@ -305,6 +305,21 @@ const formattedText = computed(() => {
   box-shadow: var(--shadow-xs);
 }
 
+/* Deleted bubbles — disabled look */
+.bubble-deleted.bubble-sent {
+  background: var(--color-surface-3);
+  color: var(--color-text-secondary);
+  box-shadow: none;
+  border: 1px dashed var(--color-border);
+}
+
+.bubble-deleted.bubble-received {
+  background: var(--color-surface);
+  color: var(--color-text-secondary);
+  box-shadow: none;
+  border: 1px dashed var(--color-border);
+}
+
 /* WhatsApp-style points for the first message in a group */
 .message-wrap.other.first-in-group .bubble-received {
   border-top-left-radius: 0;
@@ -338,6 +353,7 @@ const formattedText = computed(() => {
 
 .bubble-sent .bubble-time { color: rgba(255,255,255,0.8); opacity: 1; }
 .bubble-received .bubble-time { color: var(--color-text-muted); }
+.bubble-deleted.bubble-sent .bubble-time { color: var(--color-text-muted); }
 
 /* Hover Action Bar */
 .bubble-actions-container {
