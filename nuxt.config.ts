@@ -15,14 +15,22 @@ export default defineNuxtConfig({
       orientation: 'portrait',
       start_url: '/',
       scope: '/',
+      theme_color: '#ffffff',
+      background_color: '#ffffff',
       icons: [
         {
-          src: '/chatfill.svg',
-          sizes: 'any',
-          type: 'image/svg+xml',
+          src: '/pwa-192x192.png',
+          sizes: '192x192',
+          type: 'image/png',
           purpose: 'any maskable'
         },
-      ],
+        {
+          src: '/pwa-512x512.png',
+          sizes: '512x512',
+          type: 'image/png',
+          purpose: 'any maskable'
+        }
+      ]
     },
     workbox: {
       navigateFallback: '/',
@@ -84,8 +92,7 @@ export default defineNuxtConfig({
         { charset: 'utf-8' },
         { name: 'viewport', content: 'width=device-width, initial-scale=1' },
         { name: 'description', content: 'EzChat is a fast, modern real-time chat app for teams and friends. Start conversations, create groups, and stay connected — all in one place.' },
-        { name: 'theme-color', content: '#ffffff', media: '(prefers-color-scheme: light)' },
-        { name: 'theme-color', content: '#17171f', media: '(prefers-color-scheme: dark)' },
+        { id: 'theme-color-meta', name: 'theme-color', content: '#ffffff' },
         { name: 'robots', content: 'index, follow' },
         { name: 'author', content: 'EzChat' },
         { name: 'keywords', content: 'chat, messaging, real-time, group chat, teams, EzChat' },
