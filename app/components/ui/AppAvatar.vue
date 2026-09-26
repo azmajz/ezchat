@@ -60,6 +60,7 @@ const avatarStyle = computed(() => {
   width: 100%; height: 100%;
   border-radius: 50%;
   object-fit: cover;
+  border: 1px solid var(--color-surface-3);
 }
 .avatar-initials {
   width: 100%; height: 100%;

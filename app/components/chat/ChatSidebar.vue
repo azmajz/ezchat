@@ -229,6 +229,7 @@ function setTab(tab) {
   height: 100%;
   overflow: hidden;
   background: var(--color-sidebar);
+  user-select: none;
 }
 
 .sidebar-header {
@@ -316,12 +317,12 @@ function setTab(tab) {
 }
 
 .sidebar-search {
-  padding: 0.25rem 0.75rem 0.75rem;
+  padding: 0.25rem 0.75rem 0.25rem;
   flex-shrink: 0;
 }
 @media (max-width: 767px) {
   .sidebar-search {
-    padding: 0.5rem 0.875rem 0.875rem;
+    padding: 0.25rem 0.875rem 0.25rem;
   }
 }
 
@@ -387,7 +388,7 @@ function setTab(tab) {
 .sidebar-list {
   flex: 1;
   overflow-y: auto;
-  padding: 0.5rem 0.5rem;
+  padding: 0.125rem 0.5rem 0.5rem;
 }
 @media (max-width: 767px) {
   .sidebar-list {

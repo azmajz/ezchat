@@ -7,7 +7,12 @@
     </template>
 
     <template v-else-if="chatData">
-      <ChatHeader :chat="chatData" @clear-chat="handleClearChat" />
+      <ChatHeader 
+        :chat="chatData" 
+        @clear-chat="handleClearChat"
+        @delete-chat="handleDeleteChat"
+        @leave-group="handleLeaveGroup"
+      />
       <ChatMessages
         :messages="messages"
         :messages-loading="messagesLoading"
@@ -42,8 +47,10 @@ const route = useRoute()
 const chatId = computed(() => route.params.chatId)
 
 const { messages, messagesLoading, subscribeMessages, unsubscribeMessages, sendMessage, deleteMessage, clearChat, toggleReaction } = useMessages()
+const { deleteChat, leaveGroup } = useChats()
 const { showToast } = useUI()
 const { currentUser } = useAuth()
+const router = useRouter()
 
 const chatData = ref(null)
 const messageToEdit = ref(null)
@@ -108,6 +115,30 @@ async function handleClearChat() {
       showToast('Chat cleared', 'success')
     } catch {
       showToast('Could not clear chat', 'error')
+    }
+  }
+}
+
+async function handleDeleteChat() {
+  if (confirm('Are you sure you want to PERMANENTLY delete this chat and ALL its messages? This action cannot be undone.')) {
+    try {
+      await deleteChat(chatId.value)
+      router.push('/chat')
+      showToast('Chat deleted completely', 'success')
+    } catch {
+      showToast('Could not delete chat', 'error')
+    }
+  }
+}
+
+async function handleLeaveGroup() {
+  if (confirm('Are you sure you want to leave this group?')) {
+    try {
+      await leaveGroup(chatId.value)
+      router.push('/chat')
+      showToast('Left group', 'success')
+    } catch {
+      showToast('Could not leave group', 'error')
     }
   }
 }

@@ -8,7 +8,8 @@
     "generate": "nuxt generate",
     "preview": "nuxt preview",
     "postinstall": "nuxt prepare",
-    "deploy": "npx firebase-tools deploy --only hosting:ezct"
+    "deploy": "firebase deploy --only hosting:ezct",
+    "publish": "npm run dev & npm run deploy"
   },
   "dependencies": {
     "firebase": "^12.19.0",

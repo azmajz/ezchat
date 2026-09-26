@@ -39,8 +39,14 @@
              <Icon name="lucide:info" size="16" /> View Info
           </button>
           <div class="dropdown-divider"></div>
-          <button class="dropdown-item text-danger" @click="$emit('clear-chat'); showMenu = false">
-             <Icon name="lucide:trash-2" size="16" /> Clear Chat
+          <button class="dropdown-item" @click="$emit('clear-chat'); showMenu = false">
+             <Icon name="lucide:eraser" size="16" /> Clear Chat
+          </button>
+          <button v-if="!chat?.participants?.includes('bot_echo')" class="dropdown-item text-danger" @click="$emit('delete-chat'); showMenu = false">
+             <Icon name="lucide:trash-2" size="16" /> Delete Chat
+          </button>
+          <button v-if="chat?.type === 'group'" class="dropdown-item text-danger" @click="$emit('leave-group'); showMenu = false">
+             <Icon name="lucide:log-out" size="16" /> Leave Group
           </button>
         </div>
       </div>
@@ -57,7 +63,7 @@ import { getFirestore, doc, onSnapshot } from 'firebase/firestore'
 const props = defineProps({
   chat: { type: Object, default: null },
 })
-defineEmits(['clear-chat'])
+defineEmits(['clear-chat', 'delete-chat', 'leave-group'])
 
 const { currentUser } = useAuth()
 const showGroupInfo = ref(false)
