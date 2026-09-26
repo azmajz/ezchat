@@ -14,12 +14,12 @@
             <span class="profile-email truncate">{{ currentUser?.email }}</span>
           </div>
           <div class="dropdown-divider"></div>
-          <NuxtLink to="/settings" class="dropdown-item" @click="showProfileMenu = false">
+          <button class="dropdown-item" @click="() => { showSettingsModal = true; showProfileMenu = false; }">
             <Icon name="lucide:settings" size="16" /> Settings
-          </NuxtLink>
-          <NuxtLink to="/settings" class="dropdown-item" @click="showProfileMenu = false">
-            <Icon name="lucide:user" size="16" /> My Account
-          </NuxtLink>
+          </button>
+          <button class="dropdown-item" @click="() => { showProfileModal = true; showProfileMenu = false; }">
+            <Icon name="lucide:user" size="16" /> My Profile
+          </button>
           <button class="dropdown-item" @click="() => { toggleTheme(); showProfileMenu = false; }">
             <Icon :name="theme === 'dark' ? 'lucide:sun' : 'lucide:moon'" size="16" />
             {{ theme === 'dark' ? 'Light Mode' : 'Dark Mode' }}
@@ -48,10 +48,10 @@
         <Icon :name="theme === 'dark' ? 'lucide:sun' : 'lucide:moon'" size="24" />
         <span>Theme</span>
       </button>
-      <NuxtLink to="/settings" class="nav-rail-item" :class="{ active: $route.path.startsWith('/settings') }" title="Settings">
+      <button class="nav-rail-item" :class="{ active: showSettingsModal }" @click="showSettingsModal = true" title="Settings">
         <Icon name="lucide:settings" size="24" />
         <span>Settings</span>
-      </NuxtLink>
+      </button>
     </div>
   </div>
 </template>
@@ -61,6 +61,7 @@ const route = useRoute()
 const router = useRouter()
 const { currentUser, logout } = useAuth()
 const { theme, toggleTheme } = useTheme()
+const { showSettingsModal, showProfileModal } = useUI()
 
 const showProfileMenu = ref(false)
 const activeTab = computed(() => route.query.filter === 'groups' ? 'groups' : 'chat')

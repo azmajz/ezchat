@@ -1,19 +1,15 @@
 <template>
-  <div class="settings-page">
-    <header class="settings-header">
-      <NuxtLink to="/chat" class="btn-icon back-btn" aria-label="Back to chat list">
-        <Icon name="lucide:arrow-left" size="20" />
-      </NuxtLink>
-      <h2>Settings</h2>
-      <NuxtLink to="/chat" class="btn-icon close-btn" aria-label="Close settings">
-        <Icon name="lucide:x" size="20" />
-      </NuxtLink>
-    </header>
-
+  <AppModal
+    :modelValue="modelValue"
+    @update:modelValue="$emit('update:modelValue', $event)"
+    title="Settings"
+    size="md"
+    mobileFullscreen
+  >
     <div class="settings-content">
       
-      <!-- Profile Card (Link to Profile) -->
-      <NuxtLink to="/profile" class="profile-card">
+      <!-- Profile Card (Link to Profile Modal) -->
+      <button class="profile-card" @click="$emit('openProfile')">
         <AppAvatar :src="currentUser?.photoURL" :name="currentUser?.displayName" size="lg" />
         <div class="profile-info">
           <h3>{{ currentUser?.displayName || 'User' }}</h3>
@@ -22,7 +18,7 @@
         <div class="profile-action">
           <Icon name="lucide:chevron-right" size="20" />
         </div>
-      </NuxtLink>
+      </button>
 
       <div class="settings-group">
         <h3 class="group-title">Preferences</h3>
@@ -71,7 +67,7 @@
       <div class="settings-group">
         <h3 class="group-title">More</h3>
         <div class="settings-list">
-          <NuxtLink to="/privacy-policy" class="list-item clickable">
+          <NuxtLink to="/privacy-policy" class="list-item clickable" @click="$emit('update:modelValue', false)">
             <div class="item-icon-wrap privacy-icon">
               <Icon name="lucide:shield" size="18" />
             </div>
@@ -103,11 +99,14 @@
       </div>
 
     </div>
-  </div>
+  </AppModal>
 </template>
 
 <script setup>
-definePageMeta({ middleware: 'auth', layout: 'default' })
+const props = defineProps({
+  modelValue: Boolean
+})
+const emit = defineEmits(['update:modelValue', 'openProfile'])
 
 const { currentUser, logout } = useAuth()
 const router = useRouter()
@@ -115,77 +114,17 @@ const { theme, toggleTheme } = useTheme()
 const { enabled: notificationsEnabled, permission, toggleNotifications } = useNotifications()
 
 async function confirmLogout() {
+  emit('update:modelValue', false)
   await logout()
   router.push('/login')
 }
 </script>
 
 <style scoped>
-.settings-page {
-  display: flex;
-  flex-direction: column;
-  height: 100%;
-  min-height: 0;
-  overflow-y: auto;
-  background: var(--color-surface-2);
-}
-
-@media (max-width: 767px) {
-  .settings-page {
-    height: 100dvh;
-  }
-}
-
-.settings-header {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  padding: 0 1rem;
-  height: var(--header-height, 60px);
-  background: var(--color-surface-2);
-  border-bottom: 1px solid var(--color-border);
-  position: sticky;
-  top: 0;
-  z-index: 10;
-  flex-shrink: 0;
-}
-
-.settings-header h2 {
-  font-size: var(--font-size-base, 1rem);
-  font-weight: 700;
-  margin: 0;
-  color: var(--color-text);
-  flex: 1;
-  text-align: center;
-}
-
-.back-btn {
-  display: inline-flex;
-  color: var(--color-text-secondary);
-  width: 32px;
-  justify-content: flex-start;
-}
-
-.close-btn {
-  display: inline-flex;
-  color: var(--color-text-secondary);
-  width: 32px;
-  justify-content: flex-end;
-}
-
-@media (max-width: 767px) {
-  .close-btn { display: none; }
-  .settings-header h2 { text-align: left; margin-left: 0.5rem; }
-}
-
 .settings-content {
-  padding: 1.5rem 1rem 5.5rem;
-  max-width: 600px;
-  margin: 0 auto;
-  width: 100%;
   display: flex;
   flex-direction: column;
-  gap: 2rem;
+  gap: 1.5rem;
 }
 
 /* Profile Card */
@@ -200,6 +139,9 @@ async function confirmLogout() {
   box-shadow: var(--shadow-sm);
   text-decoration: none;
   transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+  width: 100%;
+  cursor: pointer;
+  text-align: left;
 }
 .profile-card:hover {
   transform: translateY(-2px);
@@ -337,7 +279,7 @@ async function confirmLogout() {
   text-align: center;
   font-size: 0.85rem;
   color: var(--color-text-muted);
-  margin-top: 1rem;
+  margin-top: 0.5rem;
 }
 
 /* Toggle Switch Styles */

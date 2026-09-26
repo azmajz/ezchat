@@ -6,7 +6,30 @@
 
 <script setup>
 const { initTheme } = useTheme()
-onMounted(() => { initTheme() })
+const { currentUser } = useAuth()
+const { startPresence, stopPresence } = usePresence()
+
+onMounted(() => {
+  initTheme()
+})
+
+// Start presence when user is authenticated, stop when they log out
+watch(
+  currentUser,
+  (user, prevUser) => {
+    if (user) {
+      startPresence()
+    } else if (prevUser) {
+      // prevUser existed means this is a logout — stopPresence already sets isOnline: false
+      stopPresence()
+    }
+  },
+  { immediate: true }
+)
+
+onUnmounted(() => {
+  stopPresence()
+})
 </script>
 
 <style>

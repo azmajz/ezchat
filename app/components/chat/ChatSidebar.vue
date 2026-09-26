@@ -6,7 +6,7 @@
       <h2 class="sidebar-title">{{ sidebarTitle }}</h2>
 
       <!-- Mobile: current user profile -->
-      <NuxtLink to="/settings" class="sidebar-me" title="My profile">
+      <button class="sidebar-me" @click="showSettingsModal = true" title="My profile">
         <AppAvatar
           :src="currentUser?.photoURL"
           :name="currentUser?.displayName || 'Me'"
@@ -17,7 +17,7 @@
           <span class="sidebar-me-name">{{ currentUser?.displayName || 'Me' }}</span>
           <span class="sidebar-me-status">Online</span>
         </div>
-      </NuxtLink>
+      </button>
 
       <div class="sidebar-actions">
         <button class="btn-icon" @click="showGroupCreateModal = true" title="New group" id="btn-new-group">
@@ -40,6 +40,9 @@
           placeholder="Search conversations…"
           id="sidebar-search"
         />
+        <button v-if="searchQuery" class="search-clear-btn" @click="searchQuery = ''" aria-label="Clear search">
+          <Icon name="lucide:x" size="14" />
+        </button>
       </div>
     </div>
 
@@ -56,7 +59,17 @@
       </template>
 
       <template v-else-if="filteredChats.length === 0">
-        <div class="sidebar-empty">
+        <div v-if="searchQuery" class="sidebar-empty">
+          <Icon name="lucide:search-x" size="40" style="opacity: 0.25; stroke-width: 1.5;" />
+          <p class="search-empty-text">No results found for "<strong>{{ searchQuery }}</strong>"</p>
+          <button class="btn btn-secondary btn-sm" @click="searchQuery = ''">Clear search</button>
+        </div>
+        <div v-else-if="activeTab === 'groups'" class="sidebar-empty">
+          <Icon name="lucide:users" size="40" style="opacity: 0.25; stroke-width: 1.5;" />
+          <p>No groups yet</p>
+          <button class="btn btn-primary btn-sm" @click="showGroupCreateModal = true">Create a group</button>
+        </div>
+        <div v-else class="sidebar-empty">
           <Icon name="lucide:message-square" size="40" style="opacity: 0.25; stroke-width: 1.5;" />
           <p>No conversations yet</p>
           <button class="btn btn-primary btn-sm" @click="showSearchModal = true">Start a chat</button>
@@ -74,21 +87,6 @@
       </template>
     </div>
 
-    <!-- Mobile-only bottom bar -->
-    <div class="sidebar-mobile-bar">
-      <button class="mobile-bar-btn" :class="{ active: activeTab === 'chat' }" @click="setTab('chat')">
-        <Icon name="lucide:message-square" size="20" />
-        <span>Chats</span>
-      </button>
-      <button class="mobile-bar-btn" :class="{ active: activeTab === 'groups' }" @click="setTab('groups')">
-        <Icon name="lucide:users" size="20" />
-        <span>Groups</span>
-      </button>
-      <NuxtLink to="/settings" class="mobile-bar-btn">
-        <Icon name="lucide:settings" size="20" />
-        <span>Settings</span>
-      </NuxtLink>
-    </div>
   </div>
 
   <!-- Modals live here — Teleported to body, always above everything -->
@@ -102,7 +100,7 @@ const router = useRouter()
 
 const { chats, chatsLoading } = useChats()
 const { currentUser } = useAuth()
-const { showSearchModal, showGroupCreateModal } = useUI()
+const { showSearchModal, showGroupCreateModal, showSettingsModal } = useUI()
 
 const activeTab = computed(() => route.query.filter === 'groups' ? 'groups' : 'chat')
 const activeChat = computed(() => route.params.chatId)
@@ -183,6 +181,8 @@ function setTab(tab) {
 .sidebar-me {
   display: none;
   align-items: center;
+  justify-content: flex-start;
+  text-align: left;
   gap: 0.75rem;
   text-decoration: none;
   border-radius: var(--radius-md);
@@ -258,13 +258,21 @@ function setTab(tab) {
 
 .search-input {
   width: 100%;
-  padding: 0.6rem 0.75rem 0.6rem 2.25rem;
+  padding: 0.6rem 2.25rem; /* padding for both icons */
   border-radius: var(--radius-full);
   border: 1.5px solid var(--color-border);
   background: var(--color-surface);
   color: var(--color-text);
   font-size: var(--font-size-sm);
   transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+/* Hide native search clear button */
+.search-input::-webkit-search-decoration,
+.search-input::-webkit-search-cancel-button,
+.search-input::-webkit-search-results-button,
+.search-input::-webkit-search-results-decoration {
+  display: none;
 }
 
 .search-input:focus {
@@ -275,65 +283,35 @@ function setTab(tab) {
 
 .search-input::placeholder { color: var(--color-text-muted); }
 
+.search-clear-btn {
+  position: absolute;
+  right: 0.5rem;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  color: var(--color-text-muted);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.25rem;
+  border-radius: 50%;
+  transition: background var(--transition-fast), color var(--transition-fast);
+}
+.search-clear-btn:hover {
+  background: var(--color-surface-3, rgba(0,0,0,0.05));
+  color: var(--color-text);
+}
+
 .sidebar-list {
   flex: 1;
   overflow-y: auto;
   padding: 0.5rem 0.5rem;
 }
-
-/* ── Mobile bottom bar ── */
-.sidebar-mobile-bar {
-  display: none;
-}
 @media (max-width: 767px) {
-  .sidebar-mobile-bar {
-    display: flex;
-    align-items: stretch;
-    border-top: 1px solid var(--color-border);
-    background: var(--color-sidebar);
-    padding-bottom: env(safe-area-inset-bottom);
-    flex-shrink: 0;
-  }
-  .mobile-bar-btn {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: 0.25rem;
-    background: none;
-    border: none;
-    color: var(--color-text-muted);
-    font-family: inherit;
-    font-size: 10px;
-    font-weight: 500;
-    cursor: pointer;
-    padding: 0.6rem 0.5rem;
-    text-decoration: none;
-    transition: color 0.15s;
-    position: relative;
-  }
-  .mobile-bar-btn::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 20%;
-    right: 20%;
-    height: 2px;
-    border-radius: 0 0 2px 2px;
-    background: var(--color-primary);
-    opacity: 0;
-    transition: opacity 0.15s;
-  }
-  .mobile-bar-btn.active {
-    color: var(--color-primary);
-    font-weight: 600;
-  }
-  .mobile-bar-btn.active::before {
-    opacity: 1;
-  }
-  .mobile-bar-btn:hover {
-    color: var(--color-primary);
+  .sidebar-list {
+    padding-bottom: calc(4.5rem + env(safe-area-inset-bottom));
   }
 }
 
@@ -346,6 +324,20 @@ function setTab(tab) {
   text-align: center;
   color: var(--color-text-muted);
   font-size: var(--font-size-sm);
+}
+
+.search-empty-text {
+  word-break: break-word;
+  max-width: 100%;
+}
+
+.btn-secondary {
+  background: var(--color-surface-2);
+  color: var(--color-text);
+  border: 1px solid var(--color-border);
+}
+.btn-secondary:hover {
+  background: var(--color-surface-3);
 }
 
 .btn-sm { padding: 0.4rem 1rem; font-size: var(--font-size-xs); }

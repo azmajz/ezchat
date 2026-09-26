@@ -9,7 +9,11 @@
     <main class="chat-main-panel" :class="{ 'panel-hidden': isMobile && !mainPanelVisible }">
       <slot />
     </main>
+    <MobileBottomNav v-if="isMobile && !hasChatId" />
     <AppToast />
+    
+    <SettingsModal v-model="showSettingsModal" @openProfile="openProfile" />
+    <ProfileModal v-model="showProfileModal" />
   </div>
 </template>
 
@@ -17,8 +21,14 @@
 const route = useRoute()
 
 const hasChatId = computed(() => !!route.params.chatId)
-const isSettings = computed(() => route.path.startsWith('/settings'))
-const mainPanelVisible = computed(() => hasChatId.value || isSettings.value)
+const mainPanelVisible = computed(() => hasChatId.value)
+
+const { showSettingsModal, showProfileModal } = useUI()
+
+function openProfile() {
+  showSettingsModal.value = false
+  showProfileModal.value = true
+}
 
 const isMobile = ref(false)
 

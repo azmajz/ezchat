@@ -4,9 +4,10 @@
       <div
         v-if="modelValue"
         class="modal-overlay"
+        :class="{ 'overlay-mobile-fs': mobileFullscreen }"
         @click.self="$emit('update:modelValue', false)"
       >
-        <div class="modal-box" :class="`modal-${size}`" role="dialog" :aria-label="title">
+        <div class="modal-box" :class="[`modal-${size}`, { 'modal-mobile-fs': mobileFullscreen }]" role="dialog" :aria-label="title">
           <div v-if="title || $slots.header" class="modal-header">
             <slot name="header">
               <h2 class="modal-title">{{ title }}</h2>
@@ -32,6 +33,7 @@ defineProps({
   modelValue: Boolean,
   title: { type: String, default: '' },
   size: { type: String, default: 'md' },
+  mobileFullscreen: { type: Boolean, default: false }
 })
 defineEmits(['update:modelValue'])
 </script>
@@ -49,7 +51,7 @@ defineEmits(['update:modelValue'])
 }
 
 .modal-box {
-  background: var(--color-surface);
+  background: var(--color-surface-2);
   border-radius: var(--radius-xl);
   box-shadow: var(--shadow-modal);
   width: 100%;
@@ -57,6 +59,17 @@ defineEmits(['update:modelValue'])
   overflow: hidden;
   display: flex;
   flex-direction: column;
+}
+
+@media (max-width: 767px) {
+  .overlay-mobile-fs {
+    padding: 0;
+  }
+  .modal-mobile-fs {
+    max-height: 100dvh;
+    height: 100dvh;
+    border-radius: 0;
+  }
 }
 
 .modal-sm { max-width: 380px; }

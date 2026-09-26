@@ -22,13 +22,13 @@ export default defineNuxtConfig({
           src: '/pwa-192x192.png',
           sizes: '192x192',
           type: 'image/png',
-          purpose: 'any maskable',
+          purpose: 'any',
         },
         {
           src: '/pwa-512x512.png',
           sizes: '512x512',
           type: 'image/png',
-          purpose: 'any maskable',
+          purpose: 'any',
         },
       ],
     },
@@ -97,6 +97,8 @@ export default defineNuxtConfig({
         { name: 'author', content: 'EzChat' },
         { name: 'keywords', content: 'chat, messaging, real-time, group chat, teams, EzChat' },
         { name: 'google-site-verification', content: 'rfAfah7CjJme68pjChHlTRbTYDJNOkHtWQjvkppSKrE' },
+        { name: 'application-name', content: 'EzChat' },
+        { name: 'apple-mobile-web-app-title', content: 'EzChat' },
 
         // Open Graph (WhatsApp, Facebook, iMessage, Telegram previews)
         { property: 'og:type', content: 'website' },
@@ -117,7 +119,8 @@ export default defineNuxtConfig({
       ],
       link: [
         { rel: 'icon', type: 'image/svg+xml', href: '/chatfill.svg' },
-        { rel: 'apple-touch-icon', href: '/chatfill.svg' },
+        { rel: 'apple-touch-icon', sizes: '192x192', href: '/pwa-192x192.png' },
+        { rel: 'apple-touch-icon', sizes: '512x512', href: '/pwa-512x512.png' },
         { rel: 'canonical', href: 'https://ezct.web.app' },
         { rel: 'preconnect', href: 'https://fonts.googleapis.com' },
         { rel: 'preconnect', href: 'https://fonts.gstatic.com', crossorigin: '' },

@@ -2,6 +2,8 @@
 const toasts = ref([])
 const showSearchModal = ref(false)
 const showGroupCreateModal = ref(false)
+const showSettingsModal = ref(false)
+const showProfileModal = ref(false)
 
 export function useUI() {
   function showToast(message, type = 'info', duration = 3000) {
@@ -16,6 +18,8 @@ export function useUI() {
     toasts,
     showToast,
     showSearchModal,
-    showGroupCreateModal
+    showGroupCreateModal,
+    showSettingsModal,
+    showProfileModal
   }
 }
