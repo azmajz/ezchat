@@ -118,7 +118,7 @@ export default defineNuxtConfig({
         { name: 'twitter:image', content: 'https://ezct.web.app/og-image.png' },
       ],
       link: [
-        { rel: 'icon', type: 'image/svg+xml', href: '/chatfill.svg' },
+        { rel: 'icon', type: 'image/png', href: '/pwa-512x512.png' },
         { rel: 'apple-touch-icon', sizes: '512x512', href: '/pwa-512x512.png' },
         { rel: 'canonical', href: 'https://ezct.web.app' },
         { rel: 'preconnect', href: 'https://fonts.googleapis.com' },
