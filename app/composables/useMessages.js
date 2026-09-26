@@ -62,7 +62,7 @@ export function useMessages() {
           if (change.type === 'added') {
             const m = change.doc.data()
             if (m.senderId !== uid && !m.isDeleted) {
-              const senderName = m.senderId === 'bot_echo' ? 'Echo Bot' : 'Someone'
+              const senderName = m.senderId === 'bot_echo' ? 'EzChat Bot' : 'Someone'
               const text = m.type === 'text' ? m.text : 'Sent an attachment'
               notify(`New message from ${senderName}`, { body: text })
             }
@@ -129,28 +129,13 @@ export function useMessages() {
       ...unreadUpdates
     })
 
-    // --- Echo Bot Interceptor ---
-    // If this is a direct chat with the bot, simulate a reply.
-    if (participants.includes('bot_echo') && uid !== 'bot_echo') {
-      setTimeout(async () => {
-        const replyText = payload.type === 'text' 
-          ? `You said: "${payload.text}"` 
-          : `You sent a file: ${payload.fileName}`
-          
-        await addDoc(collection(db, 'chats', chatId, 'messages'), {
-          senderId: 'bot_echo',
-          type: 'text',
-          text: replyText,
-          createdAt: serverTimestamp(),
-        })
-
-        await updateDoc(doc(db, 'chats', chatId), {
-          lastMessage: replyText,
-          lastMessageAt: serverTimestamp(),
-          lastMessageSenderId: 'bot_echo',
-          [`unreadCount.${uid}`]: increment(1)
-        })
-      }, 1000)
+    // --- EzChat Bot Interceptor ---
+    // If this is a direct chat with the bot, simulate an intelligent reply.
+    const { BOT_ID, handleBotMessage } = useBot()
+    if (participants.includes(BOT_ID) && uid !== BOT_ID) {
+      setTimeout(() => {
+        handleBotMessage(chatId, payload).catch(console.error)
+      }, 500)
     }
   }
 
@@ -193,6 +178,16 @@ export function useMessages() {
     await updateDoc(doc(db, 'chats', chatId), {
       [`clearedAt.${uid}`]: serverTimestamp()
     })
+
+    // If chat is with the bot, re-send the intro message
+    const chatSnap = await getDoc(doc(db, 'chats', chatId))
+    const chatData = chatSnap.data()
+    const { BOT_ID, sendBotWelcome } = useBot()
+    if (chatData?.participants?.includes(BOT_ID)) {
+      setTimeout(() => {
+        sendBotWelcome(chatId, uid).catch(console.error)
+      }, 500)
+    }
   }
 
   async function toggleReaction(chatId, messageId, emoji) {

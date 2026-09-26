@@ -24,7 +24,9 @@
           @delete="$emit('delete-message', item.id)"
           @edit="$emit('edit-message', item)"
           @react="(emoji) => $emit('react-message', item.id, emoji)"
+          @quick-reply="(reply) => $emit('quick-reply', reply)"
           @image-loaded="scrollToBottom(true)"
+          :disable-reactions="isBotChat"
         />
       </template>
 
@@ -51,12 +53,14 @@ const props = defineProps({
   isGroup: { type: Boolean, default: false },
   chat: { type: Object, default: null },
 })
-defineEmits(['delete-message', 'edit-message', 'react-message'])
+defineEmits(['delete-message', 'edit-message', 'react-message', 'quick-reply'])
 
 const { currentUser } = useAuth()
 const containerRef = ref(null)
 const participantMap = ref({})
 const unsubs = {}
+
+const isBotChat = computed(() => props.participants?.includes('bot_echo'))
 
 const activeTypers = computed(() => {
   if (!props.chat?.typing) return []
@@ -146,7 +150,7 @@ watch(() => props.messages.length, (newLen, oldLen) => {
   nextTick(() => {
     // If oldLen is 0, it's an initial load, so snap instantly. Otherwise, smooth scroll.
     const smooth = oldLen > 0
-    setTimeout(() => scrollToBottom(smooth), 100)
+    setTimeout(() => scrollToBottom(smooth), 200)
   })
 })
 
@@ -201,11 +205,17 @@ onMounted(() => {
   flex-direction: column;
   gap: 0.125rem;
   min-height: 100%;
-  padding-bottom: 1rem;
 }
 
 .messages-list::before {
   content: '';
   flex: 1;
+}
+
+.messages-list::after {
+  content: '';
+  display: block;
+  min-height: 1.25rem;
+  flex-shrink: 0;
 }
 </style>

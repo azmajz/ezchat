@@ -44,8 +44,8 @@
 
     <!-- Bottom actions -->
     <div class="nav-rail-bottom">
-      <button class="nav-rail-item" @click="toggleTheme" :title="theme === 'dark' ? 'Light Mode' : 'Dark Mode'">
-        <Icon :name="theme === 'dark' ? 'lucide:sun' : 'lucide:moon'" size="24" />
+      <button class="nav-rail-item" @click="toggleTheme" :title="'Switch to ' + (theme === 'dark' ? 'Light Mode' : 'Dark Mode')">
+        <Icon :name="theme === 'dark' ? 'lucide:moon' : 'lucide:sun'" size="24" />
         <span>Theme</span>
       </button>
       <button class="nav-rail-item" :class="{ active: showSettingsModal }" @click="showSettingsModal = true" title="Settings">

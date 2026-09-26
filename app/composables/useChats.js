@@ -160,56 +160,7 @@ export function useChats() {
       )
   }
 
-  async function ensureEchoBot() {
-    const db = getDb()
-    const uid = auth.currentUser?.uid
-    if (!uid) return
 
-    // Ensure bot user exists
-    const botRef = doc(db, 'users', 'bot_echo')
-    const botSnap = await getDoc(botRef)
-    if (!botSnap.exists()) {
-      await setDoc(botRef, {
-        uid: 'bot_echo',
-        displayName: 'Echo Bot',
-        email: 'echo@ezchat.app',
-        photoURL: 'https://api.dicebear.com/7.x/bottts/svg?seed=echo&backgroundColor=6366f1',
-        isOnline: true,
-        lastSeen: serverTimestamp()
-      })
-    }
-
-    // Check if chat exists with the bot
-    const q = query(
-      collection(db, 'chats'),
-      where('type', '==', 'direct'),
-      where('participants', 'array-contains', uid)
-    )
-    const snap = await getDocs(q)
-    const existing = snap.docs.find((d) => d.data().participants.includes('bot_echo'))
-    
-    if (!existing) {
-      // Create chat with bot
-      const chatRef = await addDoc(collection(db, 'chats'), {
-        type: 'direct',
-        participants: [uid, 'bot_echo'],
-        createdBy: 'bot_echo',
-        createdAt: serverTimestamp(),
-        lastMessage: 'Hi! I am the Echo Bot. Send me a message and I will reply!',
-        lastMessageAt: Timestamp.now(),
-        name: null,
-        photoURL: null,
-      })
-
-      // Add welcome message
-      await addDoc(collection(db, `chats/${chatRef.id}/messages`), {
-        text: 'Hi there! 👋 I am the Echo Bot. Send me a message and I will echo it back to you. This is a great way to test the chat UI!',
-        senderId: 'bot_echo',
-        createdAt: serverTimestamp(),
-        type: 'text',
-      })
-    }
-  }
 
   async function setTypingState(chatId, isTyping) {
     const db = getDb()
@@ -233,7 +184,6 @@ export function useChats() {
     leaveGroup,
     getChatById,
     searchUsers,
-    ensureEchoBot,
     setTypingState,
   }
 }

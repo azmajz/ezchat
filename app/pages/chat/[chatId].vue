@@ -17,6 +17,7 @@
         @delete-message="handleDelete"
         @edit-message="handleEditMessage"
         @react-message="handleReact"
+        @quick-reply="handleQuickReply"
       />
       <ChatComposer
         :chat-id="chatId"
@@ -40,7 +41,7 @@ definePageMeta({ middleware: 'auth', layout: 'default' })
 const route = useRoute()
 const chatId = computed(() => route.params.chatId)
 
-const { messages, messagesLoading, subscribeMessages, unsubscribeMessages, deleteMessage, clearChat, toggleReaction } = useMessages()
+const { messages, messagesLoading, subscribeMessages, unsubscribeMessages, sendMessage, deleteMessage, clearChat, toggleReaction } = useMessages()
 const { showToast } = useUI()
 const { currentUser } = useAuth()
 
@@ -108,6 +109,14 @@ async function handleClearChat() {
     } catch {
       showToast('Could not clear chat', 'error')
     }
+  }
+}
+
+async function handleQuickReply(reply) {
+  try {
+    await sendMessage(chatId.value, { type: 'text', text: reply })
+  } catch (err) {
+    showToast('Failed to send quick reply', 'error')
   }
 }
 

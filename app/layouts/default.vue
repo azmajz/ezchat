@@ -47,14 +47,15 @@ onUnmounted(() => {
 
 // Subscribe to chats when layout mounts
 const { currentUser } = useAuth()
-const { subscribeChats, unsubscribeChats, ensureEchoBot } = useChats()
+const { subscribeChats, unsubscribeChats } = useChats()
+const { ensureBot } = useBot()
 
 watch(currentUser, async (user) => {
   if (user) {
     try {
-      await ensureEchoBot()
+      await ensureBot()
     } catch (err) {
-      console.error('Failed to ensure echo bot:', err)
+      console.error('Failed to ensure bot:', err)
     }
     subscribeChats(user.uid)
   } else {

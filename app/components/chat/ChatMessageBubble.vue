@@ -18,9 +18,8 @@
           <span class="bubble-time">{{ formattedTime }}</span>
         </div>
         <div v-else class="bubble" :class="[isOwn ? 'bubble-sent' : 'bubble-received', `bubble-${message.type}`, !isFirstFromSender ? 'bubble-chained' : '']">
-          <!-- Text message -->
           <template v-if="message.type === 'text'">
-            <p class="bubble-text">{{ message.text }} <span v-if="message.isEdited" style="font-size: 0.75em; opacity: 0.7;">(edited)</span></p>
+            <p class="bubble-text"><span v-html="formattedText"></span> <span v-if="message.isEdited" style="font-size: 0.75em; opacity: 0.7;">(edited)</span></p>
           </template>
 
           <!-- Image message -->
@@ -38,7 +37,7 @@
           <div v-if="(hovered || showMenu) && !message.isDeleted" class="bubble-actions-container" :class="{ 'other-actions': !isOwn }">
             
             <!-- Quick Emoji Reactions -->
-            <div class="quick-reactions">
+            <div class="quick-reactions" v-if="!disableReactions">
               <button class="react-icon-btn" @click.stop="onReact('👍')" title="Thumbs up">👍</button>
               <button class="react-icon-btn" @click.stop="onReact('❤️')" title="Heart">❤️</button>
               <button class="react-icon-btn" @click.stop="onReact('😂')" title="Laugh">😂</button>
@@ -77,6 +76,18 @@
         </Transition>
       </div>
       
+      <!-- Quick Replies (for bot messages) -->
+      <div v-if="message.quickReplies && message.quickReplies.length" class="quick-replies">
+        <button 
+          v-for="reply in message.quickReplies" 
+          :key="reply"
+          class="quick-reply-btn"
+          @click="$emit('quick-reply', reply)"
+        >
+          {{ reply }}
+        </button>
+      </div>
+      
       <!-- Display Reactions -->
       <div v-if="hasReactions" class="reactions-display">
         <template v-for="(uids, emoji) in message.reactions" :key="emoji">
@@ -104,8 +115,9 @@ const props = defineProps({
   isGroup: { type: Boolean, default: false },
   isFirstFromSender: { type: Boolean, default: true },
   getParticipant: { type: Function, default: null },
+  disableReactions: { type: Boolean, default: false }
 })
-const emit = defineEmits(['delete', 'edit', 'react', 'image-loaded'])
+const emit = defineEmits(['delete', 'edit', 'react', 'image-loaded', 'quick-reply'])
 
 const { currentUser } = useAuth()
 
@@ -155,6 +167,40 @@ const formattedTime = computed(() => {
   if (!ts) return ''
   const date = ts.toDate ? ts.toDate() : new Date(ts)
   return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+})
+
+const formattedText = computed(() => {
+  if (!props.message.text) return ''
+  let text = props.message.text
+  
+  // Escape HTML to prevent XSS
+  text = text
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
+
+  // Bold: **text** or *text*
+  text = text.replace(/\*\*([^\*]+)\*\*/g, '<strong>$1</strong>')
+  text = text.replace(/\*([^\*]+)\*/g, '<strong>$1</strong>')
+
+  // Underline: __text__
+  text = text.replace(/__([^_]+)__/g, '<u>$1</u>')
+
+  // Italic: _text_
+  text = text.replace(/_([^_]+)_/g, '<em>$1</em>')
+
+  // Strikethrough: ~text~
+  text = text.replace(/~([^~]+)~/g, '<del>$1</del>')
+
+  // Code: `text`
+  text = text.replace(/`([^`]+)`/g, '<code style="background: rgba(128,128,128,0.2); padding: 0.1em 0.3em; border-radius: 4px; font-size: 0.9em;">$1</code>')
+
+  // Newlines to <br>
+  text = text.replace(/\n/g, '<br>')
+
+  return text
 })
 </script>
 
@@ -276,7 +322,7 @@ const formattedTime = computed(() => {
 /* Hover Action Bar */
 .bubble-actions-container {
   position: absolute;
-  top: -18px;
+  top: -40px;
   right: 0;
   display: flex;
   align-items: center;
@@ -382,7 +428,7 @@ const formattedTime = computed(() => {
   display: flex;
   flex-wrap: wrap;
   gap: 0.25rem;
-  margin-top: -10px;
+  margin-top: -6px;
   z-index: 5;
   position: relative;
   max-width: 90%;
@@ -402,7 +448,7 @@ const formattedTime = computed(() => {
   display: inline-flex;
   align-items: center;
   gap: 0.3rem;
-  background: var(--color-surface-2);
+  background: var(--color-surface);
   border: 1px solid var(--color-border);
   border-radius: 16px;
   padding: 0.175rem 0.45rem;
@@ -450,8 +496,42 @@ const formattedTime = computed(() => {
   box-shadow: var(--shadow-sm);
 }
 
+/* Quick Replies */
+.quick-replies {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+  padding-left: 0.5rem;
+  z-index: 5;
+}
+
+.quick-reply-btn {
+  background: var(--color-surface);
+  border: 1px solid var(--color-primary);
+  color: var(--color-primary);
+  border-radius: var(--radius-full);
+  padding: 0.4rem 0.8rem;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: var(--shadow-sm);
+}
+
+.quick-reply-btn:hover {
+  background: var(--color-primary);
+  color: #fff;
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-md);
+}
+
+.quick-reply-btn:active {
+  transform: translateY(0);
+}
+
 .reaction-badge.active {
-  background: var(--color-primary-subtle);
+  background: var(--color-sidebar-active);
   border-color: var(--color-primary);
   color: var(--color-primary);
   box-shadow: 0 0 0 1px var(--color-primary-light);
