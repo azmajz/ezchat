@@ -1,4 +1,5 @@
 <template>
+  <VitePwaManifest />
   <NuxtLayout>
     <NuxtPage />
   </NuxtLayout>
@@ -11,6 +12,11 @@ const { startPresence, stopPresence } = usePresence()
 
 onMounted(() => {
   initTheme()
+  
+  // Disable right-click in the overall app
+  document.addEventListener('contextmenu', (e) => {
+    e.preventDefault()
+  })
 })
 
 // Start presence when user is authenticated, stop when they log out

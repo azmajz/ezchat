@@ -25,7 +25,7 @@ function getFirebaseDb() {
 }
 
 // Shared reactive state (module-level singletons)
-const currentUser = ref(null)
+const currentUser = shallowRef(null)
 const authLoading = ref(true)
 
 let unsubscribeAuth = null
@@ -131,7 +131,9 @@ export function useAuth() {
       ...data,
       lastSeen: serverTimestamp(),
     })
-    currentUser.value = auth.currentUser
+    
+    // Force reactivity update since the user object mutated in-place
+    triggerRef(currentUser)
   }
 
   return {
