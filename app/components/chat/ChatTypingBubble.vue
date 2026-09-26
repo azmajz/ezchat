@@ -48,6 +48,20 @@ defineProps({
   align-items: flex-start;
 }
 
+@media (max-width: 768px) {
+  .typing-wrap {
+    gap: 0.35rem;
+  }
+  .message-avatar {
+    width: 26px;
+  }
+  .message-avatar :deep(.avatar) {
+    width: 26px;
+    height: 26px;
+    font-size: 11px;
+  }
+}
+
 .sender-name {
   font-size: var(--font-size-xs);
   font-weight: 600;
@@ -72,7 +86,7 @@ defineProps({
   background: var(--color-received-bg);
   color: var(--color-received-text);
   border-bottom-left-radius: var(--radius-sm);
-  border-top-left-radius: var(--radius-lg);
+  border-top-left-radius: 0;
 }
 
 .typing-indicator {

@@ -16,6 +16,8 @@ import {
   Timestamp,
   setDoc,
   deleteField,
+  deleteDoc,
+  writeBatch
 } from 'firebase/firestore'
 import { getAuth } from 'firebase/auth'
 
@@ -171,6 +173,23 @@ export function useChats() {
     })
   }
 
+  async function deleteChat(chatId) {
+    const db = getDb()
+    
+    // 1. Get all messages
+    const msgsSnap = await getDocs(collection(db, 'chats', chatId, 'messages'))
+    
+    // 2. Batch delete all messages
+    const batch = writeBatch(db)
+    msgsSnap.docs.forEach(docSnap => {
+      batch.delete(docSnap.ref)
+    })
+    await batch.commit()
+
+    // 3. Delete the chat document itself
+    await deleteDoc(doc(db, 'chats', chatId))
+  }
+
   return {
     chats: readonly(chats),
     chatsLoading: readonly(chatsLoading),
@@ -185,5 +204,6 @@ export function useChats() {
     getChatById,
     searchUsers,
     setTypingState,
+    deleteChat,
   }
 }

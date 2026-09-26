@@ -7,17 +7,26 @@ function getDb() {
   return _db
 }
 
+let _ensuringBotPromise = null
+let _ensuredForUid = null
+
 export function useBot() {
   const auth = getAuth()
   const BOT_ID = 'bot_echo'
 
   async function ensureBot() {
-    const db = getDb()
     const uid = auth.currentUser?.uid
     if (!uid) return
 
-    // Ensure bot user exists and is up to date
-    const botRef = doc(db, 'users', BOT_ID)
+    if (_ensuringBotPromise && _ensuredForUid === uid) {
+      return _ensuringBotPromise
+    }
+
+    _ensuredForUid = uid
+    _ensuringBotPromise = (async () => {
+      const db = getDb()
+      // Ensure bot user exists and is up to date
+      const botRef = doc(db, 'users', BOT_ID)
     await setDoc(botRef, {
       uid: BOT_ID,
       displayName: 'EzChat Bot',
@@ -43,7 +52,7 @@ export function useBot() {
         participants: [uid, BOT_ID],
         createdBy: BOT_ID,
         createdAt: serverTimestamp(),
-        lastMessage: 'Hi! I am EzChat Bot, your AI assistant.',
+        lastMessage: 'Hi! I am EzChat Bot, your assistant.',
         lastMessageAt: serverTimestamp(),
         name: null,
         photoURL: null,
@@ -52,6 +61,14 @@ export function useBot() {
       // Send welcome message
       await sendBotWelcome(chatRef.id, uid)
     }
+    })()
+
+    try {
+      await _ensuringBotPromise
+    } catch (e) {
+      console.error('ensureBot error:', e)
+      _ensuringBotPromise = null
+    }
   }
 
   async function sendBotWelcome(chatId, targetUid) {
@@ -59,7 +76,7 @@ export function useBot() {
     const fname = auth.currentUser?.displayName?.split(' ')[0] || 'there'
     
     await addDoc(collection(db, 'chats', chatId, 'messages'), {
-      text: `Hi ${fname}! 👋 I am EzChat Bot, your AI assistant. Choose an option below to see how I can help!`,
+      text: `Hi ${fname}! 👋 I am EzChat Bot, your assistant. Choose an option below to see how I can help!`,
       quickReplies: ['Features', 'How-Tos', 'About EzChat', 'Privacy'],
       senderId: BOT_ID,
       createdAt: serverTimestamp(),
@@ -68,7 +85,7 @@ export function useBot() {
 
     if (targetUid) {
       await updateDoc(doc(db, 'chats', chatId), {
-        lastMessage: 'Hi there! 👋 I am EzChat Bot, your AI assistant...',
+        lastMessage: 'Hi there! 👋 I am EzChat Bot, your assistant...',
         lastMessageAt: serverTimestamp(),
         lastMessageSenderId: BOT_ID,
         [`unreadCount.${targetUid}`]: increment(1)

@@ -11,6 +11,7 @@ import {
   serverTimestamp,
   limit,
   getDoc,
+  getDocs,
   increment,
   arrayUnion,
   arrayRemove,
@@ -139,6 +140,26 @@ export function useMessages() {
     }
   }
 
+  async function _syncLastMessage(chatId) {
+    const db = getDb()
+    const q = query(collection(db, 'chats', chatId, 'messages'), orderBy('createdAt', 'desc'), limit(1))
+    const lastMsgSnap = await getDocs(q)
+    if (!lastMsgSnap.empty) {
+      const lastMsg = lastMsgSnap.docs[0].data()
+      let previewText = lastMsg.isDeleted ? '🚫 This message was deleted' : lastMsg.text
+      if (lastMsg.type === 'image' && !lastMsg.isDeleted) previewText = '📎 Image'
+      if (lastMsg.type === 'file' && !lastMsg.isDeleted) previewText = '📎 File'
+      
+      await updateDoc(doc(db, 'chats', chatId), {
+        lastMessage: previewText || 'No messages yet'
+      })
+    } else {
+      await updateDoc(doc(db, 'chats', chatId), {
+        lastMessage: 'No messages yet'
+      })
+    }
+  }
+
   async function deleteMessage(chatId, messageId) {
     const db = getDb()
     const msgRef = doc(db, 'chats', chatId, 'messages', messageId)
@@ -161,6 +182,8 @@ export function useMessages() {
       filePublicId: null,
       fileName: null
     })
+
+    await _syncLastMessage(chatId)
   }
 
   async function editMessage(chatId, messageId, newText) {
@@ -169,6 +192,8 @@ export function useMessages() {
       text: newText,
       isEdited: true,
     })
+
+    await _syncLastMessage(chatId)
   }
 
   async function clearChat(chatId) {

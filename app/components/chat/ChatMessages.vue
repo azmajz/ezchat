@@ -179,6 +179,12 @@ onMounted(() => {
   background-color: var(--color-surface);
 }
 
+@media (max-width: 768px) {
+  .messages-container {
+    padding: 0.75rem 0.5rem 0 0.5rem;
+  }
+}
+
 .messages-loading, .messages-empty {
   flex: 1;
   display: flex;

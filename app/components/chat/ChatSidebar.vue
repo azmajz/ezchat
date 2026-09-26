@@ -83,10 +83,29 @@
           :chat="chat"
           :active="activeChat === chat.id"
           @click="openChat(chat.id)"
+          @contextmenu.prevent="openContextMenu($event, chat)"
         />
       </template>
     </div>
 
+  </div>
+
+  <!-- Context Menu Overlay -->
+  <div v-if="contextMenu.show" class="context-menu-overlay" @click="closeContextMenu" @contextmenu.prevent="closeContextMenu">
+    <div class="context-menu" :style="{ top: contextMenu.y + 'px', left: contextMenu.x + 'px' }" @click.stop>
+      <button class="context-menu-item" @click="handleContextClear">
+        <Icon name="lucide:eraser" size="16" />
+        <span>Clear Chat</span>
+      </button>
+      <button class="context-menu-item danger" @click="handleContextDelete">
+        <Icon name="lucide:trash-2" size="16" />
+        <span>Delete Chat</span>
+      </button>
+      <button v-if="contextMenu.chat?.type === 'group'" class="context-menu-item danger" @click="handleContextLeave">
+        <Icon name="lucide:log-out" size="16" />
+        <span>Leave Group</span>
+      </button>
+    </div>
   </div>
 
   <!-- Modals live here — Teleported to body, always above everything -->
@@ -98,15 +117,76 @@
 const route = useRoute()
 const router = useRouter()
 
-const { chats, chatsLoading } = useChats()
+const { chats, chatsLoading, leaveGroup, deleteChat } = useChats()
+const { clearChat } = useMessages()
 const { currentUser } = useAuth()
-const { showSearchModal, showGroupCreateModal, showSettingsModal } = useUI()
+const { showSearchModal, showGroupCreateModal, showSettingsModal, showToast } = useUI()
 
 const activeTab = computed(() => route.query.filter === 'groups' ? 'groups' : 'chat')
 const activeChat = computed(() => route.params.chatId)
 const sidebarTitle = computed(() => route.query.filter === 'groups' ? 'Groups' : 'Chat')
 
 const searchQuery = ref('')
+const contextMenu = ref({ show: false, x: 0, y: 0, chat: null })
+
+function openContextMenu(e, chat) {
+  // Adjust position to stay within screen bounds
+  let x = e.clientX
+  let y = e.clientY
+  
+  if (x > window.innerWidth - 180) x = window.innerWidth - 180
+  if (y > window.innerHeight - 120) y = window.innerHeight - 120
+
+  contextMenu.value = { show: true, x, y, chat }
+}
+
+function closeContextMenu() {
+  contextMenu.value.show = false
+}
+
+async function handleContextClear() {
+  const chat = contextMenu.value.chat
+  closeContextMenu()
+  if (!chat) return
+  if (confirm('Are you sure you want to clear this chat?')) {
+    try {
+      await clearChat(chat.id)
+      showToast('Chat cleared', 'success')
+    } catch {
+      showToast('Could not clear chat', 'error')
+    }
+  }
+}
+
+async function handleContextDelete() {
+  const chat = contextMenu.value.chat
+  closeContextMenu()
+  if (!chat) return
+  if (confirm('Are you sure you want to PERMANENTLY delete this chat and ALL its messages? This action cannot be undone.')) {
+    try {
+      await deleteChat(chat.id)
+      if (activeChat.value === chat.id) router.push('/chat')
+      showToast('Chat deleted completely', 'success')
+    } catch {
+      showToast('Could not delete chat', 'error')
+    }
+  }
+}
+
+async function handleContextLeave() {
+  const chat = contextMenu.value.chat
+  closeContextMenu()
+  if (!chat) return
+  if (confirm('Are you sure you want to leave this group?')) {
+    try {
+      await leaveGroup(chat.id)
+      if (activeChat.value === chat.id) router.push('/chat')
+      showToast('Left group', 'success')
+    } catch {
+      showToast('Could not leave group', 'error')
+    }
+  }
+}
 
 const filteredChats = computed(() => {
   let list = chats.value
@@ -351,7 +431,58 @@ function setTab(tab) {
 .skeleton-line-1 { height: 13px; width: 55%; border-radius: 6px; }
 .skeleton-line-2 { height: 11px; width: 80%; border-radius: 6px; }
 
+/* Context Menu */
+.context-menu-overlay {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  z-index: 1000;
+}
 
+.context-menu {
+  position: absolute;
+  background: var(--color-surface-2);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-xl);
+  padding: 0.25rem;
+  min-width: 160px;
+  display: flex;
+  flex-direction: column;
+  animation: scaleIn 150ms ease forwards;
+  transform-origin: top left;
+}
 
+@keyframes scaleIn {
+  0% { opacity: 0; transform: scale(0.95); }
+  100% { opacity: 1; transform: scale(1); }
+}
 
+.context-menu-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  width: 100%;
+  padding: 0.625rem 0.75rem;
+  border: none;
+  background: none;
+  border-radius: var(--radius-sm);
+  font-size: var(--font-size-sm);
+  color: var(--color-text);
+  font-weight: 500;
+  cursor: pointer;
+  text-align: left;
+  transition: background var(--transition-fast);
+}
+
+.context-menu-item:hover {
+  background: var(--color-surface-3);
+}
+
+.context-menu-item.danger {
+  color: var(--color-error);
+}
+
+.context-menu-item.danger:hover {
+  background: rgba(239, 68, 68, 0.08);
+}
 </style>

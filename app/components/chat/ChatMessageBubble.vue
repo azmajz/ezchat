@@ -247,6 +247,20 @@ const formattedText = computed(() => {
   align-items: flex-start;
 }
 
+@media (max-width: 768px) {
+  .message-wrap {
+    gap: 0.35rem;
+  }
+  .message-avatar {
+    width: 26px;
+  }
+  .message-avatar :deep(.avatar) {
+    width: 26px;
+    height: 26px;
+    font-size: 11px;
+  }
+}
+
 .sender-name {
   font-size: var(--font-size-xs);
   font-weight: 600;
@@ -277,6 +291,7 @@ const formattedText = computed(() => {
   background: var(--color-sent-bg);
   color: var(--color-sent-text);
   border-bottom-right-radius: var(--radius-sm);
+  border-top-right-radius: var(--radius-sm);
   box-shadow: 0 2px 8px rgba(79, 70, 229, 0.25);
 }
 
@@ -290,8 +305,13 @@ const formattedText = computed(() => {
   box-shadow: var(--shadow-xs);
 }
 
+/* WhatsApp-style points for the first message in a group */
 .message-wrap.other.first-in-group .bubble-received {
-  border-top-left-radius: var(--radius-lg);
+  border-top-left-radius: 0;
+}
+
+.message-wrap.own.first-in-group .bubble-sent {
+  border-top-right-radius: 0;
 }
 
 .bubble-image, .bubble-file {
@@ -440,6 +460,7 @@ const formattedText = computed(() => {
 }
 
 .message-wrap.other .reactions-display {
+  padding-bottom: 3px;
   margin-left: 10px;
   justify-content: flex-start;
 }
