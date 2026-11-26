@@ -114,10 +114,6 @@
           </div>
 
           <div class="dev-links">
-            <a href="https://github.com" target="_blank" rel="noopener" class="dev-link">
-              <Icon name="lucide:github" size="16" />
-              GitHub
-            </a>
             <NuxtLink to="/home" class="dev-link primary">
               <Icon name="lucide:message-circle" size="16" />
               Try EzChat

@@ -223,29 +223,29 @@
     <!-- ══════════════════════════════════════
          DEVICE SHOWCASE — desktop + mobile frames
     ══════════════════════════════════════ -->
-    <section
-      class="device-showcase container reveal"
-      @mouseenter="pauseDevice = true"
-      @mouseleave="pauseDevice = false"
-    >
+    <section class="device-showcase container reveal">
       <div class="section-head">
         <div class="sec-badge">Interface</div>
         <h2 class="sec-title">Works everywhere, beautifully.</h2>
         <p class="sec-desc">Every screen is crafted to feel native — whether you're on desktop or mobile.</p>
       </div>
 
-      <!-- Device view tabs -->
+      <!-- Device view tabs with button progress -->
       <div class="dv-tabs">
         <button
           v-for="dv in deviceViews"
           :key="dv.id"
           class="dv-tab"
-          :class="{ active: activeDevice === dv.id, paused: pauseDevice && activeDevice === dv.id }"
+          :class="{ active: activeDevice === dv.id }"
           @click="selectDevice(dv.id)"
         >
-          <Icon :name="dv.icon" size="15"/>
-          {{ dv.label }}
-          <span v-if="activeDevice === dv.id" :key="deviceCycleKey" class="tab-progress" :style="{ '--cycle-ms': `${DEVICE_INTERVAL}ms` }" />
+          <span
+            v-if="activeDevice === dv.id"
+            class="tab-fill"
+            :style="{ width: `${deviceProgress}%` }"
+          />
+          <Icon :name="dv.icon" size="15" class="tab-ic"/>
+          <span class="tab-lbl">{{ dv.label }}</span>
         </button>
       </div>
 
@@ -693,11 +693,7 @@
     <!-- ══════════════════════════════════════
          FULL CHAT SHOWCASE — Side by side detail
     ══════════════════════════════════════ -->
-    <section
-      class="showcase-section container reveal"
-      @mouseenter="pauseShowcase = true"
-      @mouseleave="pauseShowcase = false"
-    >
+    <section class="showcase-section container reveal">
       <div class="section-head">
         <div class="sec-badge">Features Tour</div>
         <h2 class="sec-title">See it in action.</h2>
@@ -709,12 +705,16 @@
           v-for="tab in tabs"
           :key="tab.id"
           class="stab"
-          :class="{ active: activeTab === tab.id, paused: pauseShowcase && activeTab === tab.id }"
+          :class="{ active: activeTab === tab.id }"
           @click="selectTab(tab.id)"
         >
-          <Icon :name="tab.icon" size="15"/>
-          {{ tab.label }}
-          <span v-if="activeTab === tab.id" :key="showcaseCycleKey" class="tab-progress" :style="{ '--cycle-ms': `${SHOWCASE_INTERVAL}ms` }" />
+          <span
+            v-if="activeTab === tab.id"
+            class="tab-fill"
+            :style="{ width: `${showcaseProgress}%` }"
+          />
+          <Icon :name="tab.icon" size="15" class="tab-ic"/>
+          <span class="tab-lbl">{{ tab.label }}</span>
         </button>
       </div>
 
@@ -966,8 +966,8 @@
           <div class="cta-bubble b3">Just clicked Join 🚀</div>
         </div>
         <div class="cta-text-side">
-          <h2 class="cta-title">Join thousands<br>already chatting.</h2>
-          <p class="cta-desc">Free forever. No credit card. No catch. Just really good messaging.</p>
+          <h2 class="cta-title">Ready to try<br>EzChat yourself?</h2>
+          <p class="cta-desc">Fast, real-time messaging built with Nuxt &amp; Firebase. Create an account and explore.</p>
           <NuxtLink to="/register" class="btn-cta">
             <Icon name="lucide:message-circle" size="17"/>
             Get started — it's free
@@ -990,8 +990,7 @@ const SHOWCASE_INTERVAL = 4500
 const DEVICE_INTERVAL = 5500
 
 const activeTab = ref('dm')
-const pauseShowcase = ref(false)
-const showcaseCycleKey = ref(0)
+const showcaseProgress = ref(0)
 
 const tabs = [
   { id: 'dm',      label: 'Direct Messages', icon: 'lucide:message-circle' },
@@ -1007,8 +1006,7 @@ const groupMembers = [
 ]
 
 const activeDevice = ref('desktop')
-const pauseDevice = ref(false)
-const deviceCycleKey = ref(0)
+const deviceProgress = ref(0)
 
 const deviceViews = [
   { id: 'desktop', label: 'Desktop',  icon: 'lucide:monitor' },
@@ -1023,35 +1021,36 @@ let observer = null
 function selectTab(id) {
   activeTab.value = id
   showcaseElapsed = 0
-  showcaseCycleKey.value++
+  showcaseProgress.value = 0
 }
 
 function selectDevice(id) {
   activeDevice.value = id
   deviceElapsed = 0
-  deviceCycleKey.value++
+  deviceProgress.value = 0
 }
 
 onMounted(() => {
-  const TICK = 100
+  const TICK = 50
   tickTimer = setInterval(() => {
-    if (!pauseShowcase.value) {
-      showcaseElapsed += TICK
-      if (showcaseElapsed >= SHOWCASE_INTERVAL) {
-        showcaseElapsed = 0
-        const idx = tabs.findIndex(t => t.id === activeTab.value)
-        activeTab.value = tabs[(idx + 1) % tabs.length].id
-        showcaseCycleKey.value++
-      }
+    showcaseElapsed += TICK
+    if (showcaseElapsed >= SHOWCASE_INTERVAL) {
+      showcaseElapsed = 0
+      showcaseProgress.value = 0
+      const idx = tabs.findIndex(t => t.id === activeTab.value)
+      activeTab.value = tabs[(idx + 1) % tabs.length].id
+    } else {
+      showcaseProgress.value = Math.min(100, (showcaseElapsed / SHOWCASE_INTERVAL) * 100)
     }
-    if (!pauseDevice.value) {
-      deviceElapsed += TICK
-      if (deviceElapsed >= DEVICE_INTERVAL) {
-        deviceElapsed = 0
-        const idx = deviceViews.findIndex(d => d.id === activeDevice.value)
-        activeDevice.value = deviceViews[(idx + 1) % deviceViews.length].id
-        deviceCycleKey.value++
-      }
+
+    deviceElapsed += TICK
+    if (deviceElapsed >= DEVICE_INTERVAL) {
+      deviceElapsed = 0
+      deviceProgress.value = 0
+      const idx = deviceViews.findIndex(d => d.id === activeDevice.value)
+      activeDevice.value = deviceViews[(idx + 1) % deviceViews.length].id
+    } else {
+      deviceProgress.value = Math.min(100, (deviceElapsed / DEVICE_INTERVAL) * 100)
     }
   }, TICK)
 
@@ -1101,9 +1100,12 @@ onUnmounted(() => {
   display: grid;
   grid-template-columns: 1fr 1fr;
   align-items: center;
-  min-height: 94vh;
-  padding: 5rem 5% 3rem;
-  gap: 3rem;
+  width: 100%;
+  max-width: 1160px;
+  margin: 0 auto;
+  min-height: 82vh;
+  padding: 3.5rem 1.5rem 2.5rem;
+  gap: 1.75rem;
   position: relative;
 }
 
@@ -2002,27 +2004,20 @@ onUnmounted(() => {
   box-shadow: 0 6px 18px rgba(99,102,241,0.32);
 }
 
-/* Auto-cycle progress indicator inside active tabs */
-.tab-progress {
+.tab-fill {
   position: absolute;
   left: 0;
+  top: 0;
   bottom: 0;
-  height: 3px;
-  width: 100%;
-  background: rgba(255, 255, 255, 0.72);
-  transform-origin: left center;
-  animation: tabProgress var(--cycle-ms, 4500ms) linear forwards;
+  background: linear-gradient(90deg, rgba(255, 255, 255, 0.2), rgba(255, 255, 255, 0.34));
+  border-right: 2px solid rgba(255, 255, 255, 0.55);
+  transition: width 70ms linear;
   pointer-events: none;
+  z-index: 0;
 }
-
-.stab.paused .tab-progress,
-.dv-tab.paused .tab-progress {
-  animation-play-state: paused;
-}
-
-@keyframes tabProgress {
-  from { transform: scaleX(0); }
-  to   { transform: scaleX(1); }
+.tab-ic, .tab-lbl {
+  position: relative;
+  z-index: 1;
 }
 
 /* Staggered animations inside the active showcase panel */
@@ -2488,7 +2483,7 @@ onUnmounted(() => {
   display: flex;
   justify-content: center;
   gap: 0.5rem;
-  margin-bottom: 2.75rem;
+  margin-bottom: 2.5rem;
   flex-wrap: wrap;
 }
 
@@ -2894,14 +2889,14 @@ onUnmounted(() => {
   display: flex;
   align-items: flex-end;
   justify-content: center;
-  gap: 2.5rem;
+  gap: 2.75rem;
 }
 
 .phone-frame {
-  width: 230px;
+  width: 284px;
   background: var(--color-surface-2);
   border: 2px solid var(--color-border-strong);
-  border-radius: 36px;
+  border-radius: 38px;
   overflow: hidden;
   display: flex;
   flex-direction: column;
@@ -3006,21 +3001,22 @@ onUnmounted(() => {
   flex: 1;
   display: flex;
   flex-direction: column;
-  gap: 0.45rem;
-  padding: 0.6rem;
+  gap: 0.55rem;
+  padding: 0.75rem;
+  min-height: 295px;
   overflow: hidden;
 }
 
 .sm-av {
-  width: 20px !important;
-  height: 20px !important;
-  font-size: 0.55rem !important;
+  width: 22px !important;
+  height: 22px !important;
+  font-size: 0.58rem !important;
 }
 
 .mob-bubble {
-  font-size: 0.72rem !important;
-  padding: 0.4rem 0.65rem !important;
-  max-width: 165px !important;
+  font-size: 0.75rem !important;
+  padding: 0.45rem 0.75rem !important;
+  max-width: 210px !important;
 }
 
 .sm-typing {
@@ -3165,12 +3161,12 @@ onUnmounted(() => {
   color: var(--color-text-muted);
 }
 .mcl-preview {
-  font-size: 0.65rem;
+  font-size: 0.68rem;
   color: var(--color-text-muted);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  max-width: 130px;
+  max-width: 175px;
 }
 .mcl-badge {
   min-width: 16px; height: 16px;
@@ -3202,7 +3198,8 @@ onUnmounted(() => {
 @media (max-width: 1024px) {
   .hero {
     grid-template-columns: 1fr;
-    padding: 4rem 5% 2rem;
+    padding: 3rem 5% 2rem;
+    gap: 2rem;
     min-height: auto;
     text-align: center;
   }
@@ -3271,6 +3268,7 @@ onUnmounted(() => {
   .browser-body { height: 380px; }
   .phone-back { display: none; }
   .phone-wrap { gap: 0; }
+  .phone-frame { width: min(310px, calc(100vw - 2.5rem)); }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -3293,8 +3291,7 @@ onUnmounted(() => {
   .chat-win-back-l,
   .chat-win-back-r,
   .device-ambient-glow,
-  .cta-bubble,
-  .tab-progress {
+  .cta-bubble {
     animation: none !important;
   }
 }
