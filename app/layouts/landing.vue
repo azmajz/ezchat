@@ -17,6 +17,7 @@
 
         <!-- Desktop Nav -->
         <nav class="header-nav desktop-nav">
+          <NuxtLink to="/about" class="nav-link">About</NuxtLink>
           <NuxtLink to="/login" class="btn btn-ghost">Login</NuxtLink>
           <NuxtLink to="/register" class="btn btn-primary">Get Started</NuxtLink>
           <button
@@ -61,6 +62,10 @@
     <!-- Mobile Drawer -->
     <Transition name="slide-down">
       <nav v-if="mobileOpen" class="mobile-drawer">
+        <NuxtLink to="/about" class="mobile-nav-link" @click="mobileOpen = false">
+          <Icon name="lucide:info" size="18" />
+          About
+        </NuxtLink>
         <NuxtLink to="/login" class="mobile-nav-link" @click="mobileOpen = false">
           <Icon name="lucide:log-in" size="18" />
           Login
@@ -85,8 +90,8 @@
           <span class="footer-brand">EzChat &copy; {{ new Date().getFullYear() }}</span>
         </div>
         <div class="footer-links">
+          <NuxtLink to="/about" class="footer-link">About</NuxtLink>
           <NuxtLink to="/privacy-policy" class="footer-link">Privacy Policy</NuxtLink>
-          <a href="#" class="footer-link">Terms of Service</a>
         </div>
       </div>
     </footer>
@@ -189,6 +194,20 @@ html.dark .auth-blob-1 {
   display: flex;
   align-items: center;
   gap: 0.75rem;
+}
+
+.nav-link {
+  font-size: var(--font-size-sm);
+  font-weight: 500;
+  color: var(--color-text-secondary);
+  text-decoration: none;
+  padding: 0.5rem 0.75rem;
+  border-radius: var(--radius-md);
+  transition: color 0.2s, background 0.2s;
+}
+.nav-link:hover, .nav-link.router-link-active {
+  color: var(--color-text);
+  background: var(--color-surface-3);
 }
 
 /* ── Theme Toggle ── */
